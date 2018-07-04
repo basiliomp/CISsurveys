@@ -85,7 +85,7 @@ general <- readxl::read_xlsx("progreso trabajo.xlsx", sheet= "tabla", skip = 1, 
 
 ################# LOOP ###################
 
-for (x in 1:nrow(general)) { 
+for (x in 20:nrow(general)) { 
   
   #################### 
   ### Importing data ###
@@ -187,19 +187,7 @@ for (x in 1:nrow(general)) {
   if (general[x,"Encuesta"] == "pre") {
       print("TABLES NOT AVAILABLE")
     } else {
-      #Tabla de transferencias desde pasadas autonómicas en términos absolutos
-      write.table.header(x = tab.auto, file = paste(general[x,"Token"], "AUTO_abs.csv", sep = "_"),
-                        header = "Voto reciente (filas) y en pasadas elecciones autonómicas (columnas) en número absolutos")
-      
-      #* #Tabla de transferencias porcentuales desde pasadas autonómicas por fila
-      write.table.header(x = round(prop.table(tab.auto, margin = 1), digits = 4)*100, #margin=1 es para % por fila
-                         file = paste(general[x,"Token"], "AUTO_perc_fila.csv", sep = "_"),
-                         header = "Voto reciente (filas) y en pasadas elecciones autonómicas (columnas) en % por fila")
-      
-      #*  #Tabla de transferencias porcentuales desde pasadas autonómicas por columna
-      write.table.header(x = round(prop.table(tab.auto, margin = 2), digits = 4)*100, #margin=2 es para % por columna
-                         file = paste(general[x,"Token"], "AUTO_perc_colu.csv", sep = "_"),
-                         header = "Voto reciente (filas) y en pasadas elecciones autonómicas (columnas) en % por columnas")
+      autonotab(tab.auto)
   }
   
   
@@ -210,29 +198,17 @@ for (x in 1:nrow(general)) {
         CISweight <- svydesign(ids= ~1, strata=~CIS[,general[[x,"Estrato"]]],
                                weights=~CIS[,general[[x,"Ponderacion"]]], data = CIS)
         tab.gen <- svytable(~RECUERDO+RVOTOGEN, design = CISweight)
-      } else if (general[x,"Encuesta"] == "pre") {
+      } else if (general[x,"Encuesta"] == "pre" & general[x,"Voto.generales"] != "") {
         print("TABLES NOT AVAILABLE")
-      } else {
-        # Guardamos como una tabla el elemento que llamaremos desde las distintas tabulaciones a realizar
-        tab.gen <- table(CIS$RECUERDO, CIS$RVOTOGEN)
+        } else {
+          # Guardamos como una tabla el elemento que llamaremos desde las distintas tabulaciones a realizar
+          tab.gen <- table(CIS$RECUERDO, CIS$RVOTOGEN)
       }
   
   if (general[x,"Encuesta"] == "pre") {
       print("TABLES NOT AVAILABLE")
         } else {
-      #Tabla de transferencias desde pasadas generales absolutas
-      write.table.header(x = tab.gen, file = paste(general[x,"Token"], "GEN_abs.csv", sep = "_"),
-                         header = "Voto reciente (filas) y en pasadas elecciones generales (columnas) en número absolutos")
-      
-      #*  #Tabla de transferencias porcentuales desde pasadas generales por fila
-      write.table.header(x = round(prop.table(tab.gen, margin = 1), digits = 4)*100, #margin=1 es para % por fila
-                         file = paste(general[x,"Token"], "GEN_perc_fila.csv", sep = "_"),
-                         header = "Voto reciente (filas) y en pasadas elecciones generales (columnas) en % por fila")
-      
-      #*  #Tabla de transferencias porcentuales desde pasadas generales por columna
-      write.table.header(x = round(prop.table(tab.gen, margin = 2), digits = 4)*100, #margin=2 es para % por columna
-                         file = paste(general[x,"Token"], "GEN_perc_colu.csv", sep = "_"),
-                         header = "Voto reciente (filas) y en pasadas elecciones generales (columnas) en % por columna")
+      generaltab(tab.gen)
             }
 
   #################### 
@@ -249,6 +225,6 @@ for (x in 1:nrow(general)) {
   }
 
 }
-}
+
 
 ################# END OF LOOP ###################
