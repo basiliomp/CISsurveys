@@ -1,0 +1,21 @@
+Entrega de los datos brutos (descargas CIS junto a ficheros SPSS transformados para incluir las variables solicitadas) el martes 25 de septiembre.
+Cada encuesta debe contener, cuando disponga de los datos pertinentes, de variable con el recuerdo de voto de esa elección, de la misma elección en el periodo anterior, y de la elección autonómica/general anterior.
+
+Estas variables deben denominarse RVAUT11AGR
+RV - Para indicar Recuerdo de Voto o INTENción de voto.
+AUT - Para indicar si se trata de unas elecciones AUTonómicas o GENerales.
+XX - Para indicar el año de esas elecciones
+AGR - Para señalar todas las variables que han sido agregadas en nuestro trabajo y no proceden directamente del fichero proporcionado por el CIS.
+
+Las variables solicitadas son:
+INTAUT: intención de voto, para encuestas preelectorales.
+RVAUT: recuerdo de voto en elecciones autonómicas. Idealmente, con el añadido del año podrían distinguirse las elecciones recientes de las de la legislatura anterior.
+RVGEN: recuerdo de voto en elecciones generales. Idealmente, con el añadido del año podrían distinguirse las elecciones recientes de las de la legislatura anterior.
+ESTUDIOS: nivel de estudios del entrevistado.
+EDAD: años que cumplió el entrevistado en su último cumpleaños.
+OCUPACIÓN: situación laboral de la persona entrevistada.
+
+----
+
+- Añadir al código la referencia del año para los nombre de las variables sobre recuerdo de voto.
+- Reordenar variables de recuerdo reciente y otro recuerdo para combinarlas de manera adecuada en la variable nueva RV, que deberá incluir los n.s./n-.c. de cada una de las variables de las que se nutre.
