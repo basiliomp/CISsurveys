@@ -85,7 +85,7 @@ general <- readxl::read_xlsx("progreso trabajo.xlsx", sheet= "tabla", skip = 1, 
 
 ################# LOOP ###################
 
-for (x in 20:nrow(general)) { 
+for (x in 1:nrow(general)) { 
   
   #################### 
   ### Importing data ###
@@ -99,6 +99,7 @@ for (x in 20:nrow(general)) {
                                        reencode='utf-8',
                                        use.value.labels = TRUE))
   
+  
   #Alternatively
   # CIS <- read_spss(file = general[[x, "Savfile"]],
   #                                      to.data.frame = TRUE, 
@@ -110,50 +111,56 @@ for (x in 20:nrow(general)) {
   #################### 
   
   # RECUERDO para el voto reciente (no missing values)
+  ## Si el valor de Voto.reciente no está vacío o es un guion, lo asignamos a CIS$RECUERDO
   if (!is.na(general[[x,"Voto.reciente"]]) & general[[x,"Voto.reciente"]] != "-") {
       CIS$RECUERDO <- CIS[[general[[x,"Voto.reciente"]]]]
       # #########
       #   } else if ("¿cómo debería combinar la variable votoreciente con la complementaria otro.reciente?") {
+       "Fue a votar y vot." | "S. que vot." 
       #   CIS$RECUERDO <- CIS[[general[[x,"Otro.reciente"]]]]
+      
     }  else {
       general[x, "Looperror"] <- print(paste("Lack of VOTO RECIENTE in", general$Token[[x]]))
   }
   
   # RVOTOAUT para las elecciones autonómicas del ciclo pasado (no missing values)
   if (!is.na(general[x,"Voto.pasado"])){
-      CIS$RVOTOAUT <- CIS[[general[[x,"Voto.pasado"]]]]
+      CIS$RVAUTAGR <- CIS[[general[[x,"Voto.pasado"]]]]
     } else {
       general[x, "Looperror"] <- print(paste("Lack of VOTO PASADO in", general$Token[[x]]))
   }
   
   # # RVOTOGEN para las elecciones generales del ciclo pasado (no missing values)
   if (!is.na(general[x,"Voto.generales"])){
-      CIS$RVOTOGEN <- CIS[[general[[x,"Voto.generales"]]]]
+      CIS$RVGENAGR <- CIS[[general[[x,"Voto.generales"]]]]
     } else {
       general[x, "Looperror"] <- print(paste("Lack of GENERALES in", general$Token[[x]]))
   }
   
   # ESTUDIOS (renombrar)
   if (!is.na(general[x, "Estudios"])){
-      CIS$ESTUDIOS <- CIS[[general[[x,"Estudios"]]]]
+      CIS$ESTUDIOSAGR <- CIS[[general[[x,"Estudios"]]]]
     # } else {
     #   general[x, "Looperror"] <- print(paste("Lack of ESTUDIOS in", general$Token[[x]]))
   }
   
   # EDAD (7 grupos)
   if (!is.na(general[x,"Edad"])){
-      CIS$EDAD <- CIS[[general[[x,"Edad"]]]]
+      CIS$EDADAGR <- CIS[[general[[x,"Edad"]]]]
     } else {
       general[x, "Looperror"] <- print(paste("Lack of EDAD in", general$Token[[x]]))
   }
   
   # OCUPACIÓN (renombrar)
   if (!is.na(general[x,"Ocupacion"])) {
-      CIS$OCUPA <- CIS[[general[[x,"Ocupacion"]]]]
+      CIS$OCUPAAGR <- CIS[[general[[x,"Ocupacion"]]]]
     # } else {
     #   general[x, "Looperror"] <- print(paste("Lack of OCUPACION in", general$Token[[x]]))
   }
-
+  
+  # ORIGEN (para encuestas en Catalunya) agregada manualmente CIS$ORIGENAGR
+  
+  
   #################### 
   ### Tabulación y exportación a EXCEL ###
   #################### 
