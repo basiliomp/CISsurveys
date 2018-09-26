@@ -77,10 +77,10 @@ CIS <- foreign_to_labelled(read.spss(file = general[[x, "Folder"]],
 
 #In the loop it could be useful to extract the variable specification with these assginmnets:
 
-CIS$"Voto.reciente" <- CIS[,general[[x, "Voto.reciente"]]]
+CIS$"Voto.reciente" <- CIS[general[[x, "Voto.reciente"]]]
 CIS$"Otro.reciente" <- CIS[,general[[x, "Otro.reciente"]]]
-CIS$"Otro.reciente.valor.voto" <- CIS[,general[[x, "Otro.reciente.valor.voto"]]]
-CIS$"Otro.reciente.valor.nc" <- CIS[,general[[x, "Otro.reciente.valor.nc"]]]
+CIS$"Otro.reciente.valor.voto" <- general[[x, "Otro.reciente.valor.voto"]]
+CIS$"Otro.reciente.valor.nc" <- general[[x, "Otro.reciente.valor.nc"]]
 
 # Then, once the variables we want to modify are set, this part of the function would work in a more elegant way:
 table(CIS$Voto.reciente, CIS$Otro.reciente, useNA = "always")
