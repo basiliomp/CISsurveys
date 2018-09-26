@@ -55,7 +55,15 @@ general <- readxl::read_xlsx("progreso trabajo.xlsx", sheet = "tabla", skip = 1,
 ### Importing data ###
 #################### 
 
-CIS <- foreign_to_labelled(read.spss(file = "MD2795-pos2009PV.sav",
+# For this toy example:
+x <- 118
+
+# Setting working directory for current survey file
+setwd(paste0(project_root, general[x, "Folder"]))
+
+CIS <- read_spss(file = general[[x, "Savfile"]])
+
+CIS <- foreign_to_labelled(read.spss(file = general[[x, "Folder"]],
   to.data.frame = TRUE, 
   reencode = 'utf-8',
   use.value.labels = TRUE))
@@ -68,14 +76,14 @@ CIS <- foreign_to_labelled(read.spss(file = "MD2795-pos2009PV.sav",
 #Visualización del cruce que queremos agrupar en la nueva variable de voto
 
 #In the loop it could be useful to extract the variable specification with these assginmnets:
-# For this toy example:
-x <- 118
 
 CIS$"Voto.reciente" <- CIS[,general[[x, "Voto.reciente"]]]
 CIS$"Otro.reciente" <- CIS[,general[[x, "Otro.reciente"]]]
+CIS$"Otro.reciente.valor.voto" <- CIS[,general[[x, "Otro.reciente.valor.voto"]]]
+CIS$"Otro.reciente.valor.nc" <- CIS[,general[[x, "Otro.reciente.valor.nc"]]]
 
 # Then, once the variables we want to modify are set, this part of the function would work in a more elegant way:
-table(CIS[[Oreciente]], CIS[[Vreciente]], useNA = "always")
+table(CIS$Voto.reciente, CIS$Otro.reciente, useNA = "always")
 
 
 # For the next loop to work, I need `CIS` to be a standard data.frame, and not a tibble.
@@ -89,15 +97,13 @@ CIS <- as.data.frame(CIS)
 
 
 # Loop proposal for complete voting behaviour
-for (x in 1:length(CIS)) {
-  if (CIS[x, "Otro.reciente"] == "Fue a votar y vot.") {
-    CIS[x, "Recuerdo.reciente"] <- CIS[x, "Voto.reciente"]
-  } else if (CIS[x, "Otro.reciente"] == "S. que vot.") {
-    CIS[x, "Recuerdo.reciente"] <- CIS[x, "Voto.reciente"]
-  } else if (CIS[x, "Otro.reciente"] == "N.C.") {
-    CIS[x, "Recuerdo.reciente"] <- "N.C. participación"
+for (y in 1:length(CIS)) {
+  if (CIS[y, "Otro.reciente"] == CIS[y, "Otro.reciente.valor.voto"]) {
+    CIS[y, "Recuerdo.reciente"] <- CIS[y, "Voto.reciente"]
+  } else if (CIS[y, "Otro.reciente"] == "Otro.reciente.valor.nc") {
+    CIS[y, "Recuerdo.reciente"] <- "N.C. participacion"
   } else {
-    CIS[x, "Recuerdo.reciente"] <- "Abstención"
+    CIS[y, "Recuerdo.reciente"] <- "Abstencion"
   }
 }
 

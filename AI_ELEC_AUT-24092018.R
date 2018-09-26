@@ -58,19 +58,25 @@ for (x in 1:nrow(general)) {
                                        use.value.labels = TRUE))
   
   #Visualización del cruce que queremos agrupar en la nueva variable de voto
-  table(CIS[[general[[x,"Otro.reciente"]]]],CIS[[general[[x,"Voto.reciente"]]]], useNA = "always")
+#  table(CIS[[general[[x,"Otro.reciente"]]]],CIS[[general[[x,"Voto.reciente"]]]], useNA = "always")
   
-  mylist <- as.list(CIS[[general[[x, "Otro.reciente"]]]])
+
   if (!is.na(general[x, "Otro.reciente"])) {
-      if (CIS[[general[[x, "Otro.reciente"]]]] == "Fue a votar y vot." |
-          CIS[[general[[x, "Otro.reciente"]]]] == "S. que vot.") {
+      if (CIS[[general[[x, "Otro.reciente"]]]] == CIS[[general[[x, "Otro.reciente.valor.voto"]]]]
+          CIS[[general[[x, "Otro.reciente.valor.voto"]]]] == 5) {
         sapply(X = CIS[[general[[x, "Otro.reciente"]]]], FUN = print)
-  } if_else(condition = CIS[[general[[x, "Otro.reciente"]]]] == "N.C.", 
-            true = CIS$RVCOMPLETO <- CIS[[general[[x,"Otro.reciente"]]]], 
-            false = CIS$RVCOMPLETO <- CIS[[general[[x,"Voto.reciente"]]]]) 
+  } if_else(condition = CIS[[general[[x, "Otro.reciente"]]]] == "N.C.",
+            true = CIS$RVCOMPLETO <- CIS[[general[[x,"Otro.reciente"]]]],
+            false = CIS$RVCOMPLETO <- CIS[[general[[x,"Voto.reciente"]]]])
+
+  }
   
-  print(getwd())
-  print(levels(CIS[[general[[x, "Otro.reciente"]]]]))
-  print(paste("_______________________", x, " out of", nrow(general), "_______________________"))
+  if (!is.na(general[[x,"Otro.reciente.valor.voto"]])) {
+    print(getwd())
+    print(general[[x, "Otro.reciente"]])
+    print(levels(CIS[[general[[x, "Otro.reciente"]]]]))
+    print(paste("_______________________", x, " out of", nrow(general), "_______________________"))
+    }
+  
 }
-}
+
