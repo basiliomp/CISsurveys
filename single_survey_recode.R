@@ -41,7 +41,7 @@ CIS <- foreign_to_labelled(read.spss(file = general[[x, "Savfile"]],
 ### Variables transformation ###
 #################### 
 
-#Visualización del cruce que queremos agrupar en la nueva variable de voto
+#VisualizaciÃ³n del cruce que queremos agrupar en la nueva variable de voto
 
 #In the loop it could be useful to extract the variable specification with these assginmnets:
 
@@ -84,14 +84,14 @@ CIS[,"Recuerdo.reciente"] <- if_else(condition = CIS[, "Otro.reciente"] == Otro.
                                     true = CIS[, "Voto.reciente"],
                                     false =  if_else(condition = CIS[, "Otro.reciente"] == 9,
                                                 true = "N.C. participacion",
-                                                false = "Abstenci�n"))
+                                                false = "Abstención"))
 "Error: NA column indexes not supported"
 
 
 ################ Alternative method case_when ################
 
-## Crear con esta fórmula un conjunto de reglas que cumplir y los datos a introducri según se cumplan. 
-## Luego en TRUE pones qué hacer si ninguna de las condiciones se cumpla
+## Crear con esta fÃ³rmula un conjunto de reglas que cumplir y los datos a introducri segÃºn se cumplan. 
+## Luego en TRUE pones quÃ© hacer si ninguna de las condiciones se cumpla
 
 case_when(CIS[, "Otro.reciente"] == Otro.reciente.valor.voto ~ CIS[, "Voto.reciente"],
           CIS[, "Otro.reciente"] == 9 ~ "N.C. participacion")
