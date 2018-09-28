@@ -16,6 +16,7 @@ library(WriteXLS)
 # Set working directory
 project_root <- "D:/Dropbox/AI_ELEC_AUT/Encuestas"
 setwd(project_root)
+# Reading index database into R
 general <- readxl::read_xlsx("progreso trabajo.xlsx", sheet = "tabla", skip = 1, col_names = T )
 
 #################### 
@@ -29,19 +30,34 @@ x <- 116
 setwd(paste0(project_root, general[x, "Folder"]))
 
 # Choose import method!
-CIS <- read_spss(file = general[[x, "Savfile"]], user_na = TRUE)
+CIS1 <- read_spss(file = general[[x, "Savfile"]], user_na = TRUE)
 
-CIS <- foreign_to_labelled(read.spss(file = general[[x, "Savfile"]],
-  to.data.frame = TRUE, 
-  reencode = 'utf-8',
-  use.value.labels = TRUE))
+CIS2 <- foreign_to_labelled(read.spss(file = general[[x, "Savfile"]],
+                                     to.data.frame = TRUE, 
+                                     reencode = 'utf-8',
+                                     use.value.labels = TRUE))
+CIS3 <- read.spss(file = general[[x, "Savfile"]],
+                                      to.data.frame = TRUE, 
+                                      reencode = 'utf-8',
+                                      use.value.labels = TRUE)
+
+# Import method comparison
+  # CIS1 analysis (read_spss)
+  CIS1[,general[[x, "Voto.reciente"]]]
+  str(CIS1[,general[[x, "Voto.reciente"]]])
+  # CIS1 analysis (read.spss)
+  CIS2[,general[[x, "Voto.reciente"]]]
+  str(CIS2[,general[[x, "Voto.reciente"]]])
+  # CIS3 analysis (read_spss)
+  CIS3[,general[[x, "Voto.reciente"]]]
+  str(CIS3[,general[[x, "Voto.reciente"]]])
 
 
 #################### 
 ### Variables transformation ###
 #################### 
 
-#VisualizaciÃ³n del cruce que queremos agrupar en la nueva variable de voto
+#Visualizacion del cruce que queremos agrupar en la nueva variable de voto
 
 #In the loop it could be useful to extract the variable specification with these assginmnets:
 
