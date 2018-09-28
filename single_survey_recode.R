@@ -12,8 +12,8 @@ library(foreign)
 library(haven)
 library(survey)
 library(WriteXLS)
-install.packages("lobster")
-library(lobster)
+devtools::install_github("r-lib/lobstr")
+library(lobstr)
 
 # Set working directory
 project_root <- "D:/Dropbox/AI_ELEC_AUT/Encuestas"
