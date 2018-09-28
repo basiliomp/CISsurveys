@@ -44,16 +44,33 @@ CIS3 <- read.spss(file = general[[x, "Savfile"]],
                                       use.value.labels = TRUE)
 
 # Import method comparison
-  # CIS1 analysis (read_spss)
+# So far, CIS2 and CIS3 seem to be equal and less useful than CIS1.
+
+##################
+# MAIN PROBLEM: DATA OF DIFFERENT TYPES DEPENDING ON HOW WE CALL IT OR SUBSET IT!
+##################
+
+  # CIS1 analysis (read_spss) <Labelled SPSS double>
   CIS1[,general[[x, "Voto.reciente"]]]
-  str(CIS1[,general[[x, "Voto.reciente"]]])
-  # CIS1 analysis (read.spss)
+  class(CIS1[,general[[x, "Voto.reciente"]]])
+  class(CIS1$p18a)
+  typeof(CIS1[,general[[x, "Voto.reciente"]]])
+  typeof(CIS1$p18a)
+  attributes(CIS1[,general[[x, "Voto.reciente"]]])
+  attributes(CIS1$p18a)
+  
+  # CIS2 analysis (foreign_to_labelled + read.spss)
   CIS2[,general[[x, "Voto.reciente"]]]
   str(CIS2[,general[[x, "Voto.reciente"]]])
+  class(CIS2$p18a)
+  typeof(CIS2$p18a)
+  attributes(VIS2$p18a)
   # CIS3 analysis (read_spss)
   CIS3[,general[[x, "Voto.reciente"]]]
   str(CIS3[,general[[x, "Voto.reciente"]]])
-
+  class(CIS3$p18a)
+  typeof(CIS3$p18a)
+  attributes(CIS3$p18a)
 
 #################### 
 ### Variables transformation ###
@@ -63,8 +80,8 @@ CIS3 <- read.spss(file = general[[x, "Savfile"]],
 
 #In the loop it could be useful to extract the variable specification with these assginmnets:
 
-CIS$"Voto.reciente" <- as.vector(CIS[general[[x, "Voto.reciente"]]])
-CIS$"Otro.reciente" <- as.vector(CIS[,general[[x, "Otro.reciente"]]])
+CIS1$"Voto.reciente" <- CIS1[general[[x, "Voto.reciente"]]]
+CIS1$"Otro.reciente" <- CIS1[,general[[x, "Otro.reciente"]]]
 "Otro.reciente.valor.voto" <- general[[x, "Otro.reciente.valor.voto"]]
 
 
@@ -104,16 +121,27 @@ CIS[,"Recuerdo.reciente"] <- if_else(condition = CIS[, "Otro.reciente"] == Otro.
                                                 true = "N.C. participacion",
                                                 false = "Abstención"))
 "Error: NA column indexes not supported"
+## The problem is getting the right type of data here while subsetting the rows we want to modify 
+## or assign to a new vector/variable.
 
 
 ################ Alternative method case_when ################
 
-## Crear con esta fÃ³rmula un conjunto de reglas que cumplir y los datos a introducri segÃºn se cumplan. 
-## Luego en TRUE pones quÃ© hacer si ninguna de las condiciones se cumpla
+## The function `case_when` allows for several rules to be applied in order over a vector.
+## The problem is getting the right type of data here while subsetting the rows we want to modify 
+## or assign to a new vector/variable.
 
-case_when(CIS[, "Otro.reciente"] == Otro.reciente.valor.voto ~ CIS[, "Voto.reciente"],
-          CIS[, "Otro.reciente"] == 9 ~ "N.C. participacion")
+table(CIS1$p15, CIS1$p18a) #Checking the bivariate distribution
+
+case_when(CIS1[, "Otro.reciente"] == Otro.reciente.valor.voto ~ CIS1[, "Voto.reciente"],
+          CIS1[, "Otro.reciente"] == 9 ~ "N.C. participacion")
 "Error: NA column indexes not supported"
+
+# But this one partially works, because the second condition is never applied 
+# (there are no cases with 88 value once it is run)
+case_when(CIS1$p15 == 1 ~ 81,
+          CIS1$p15 == 9 ~ 88)
+
 
 
 #Checking

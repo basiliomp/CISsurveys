@@ -101,10 +101,8 @@ for (x in 1:nrow(general)) {
   
   
   #Alternatively
-  # CIS <- read_spss(file = general[[x, "Savfile"]],
-  #                                      to.data.frame = TRUE, 
-  #                                      reencode='utf-8',
-  #                                      use.value.labels = TRUE)
+  #CIS <- read_spss(file = general[[x, "Savfile"]], user_na = TRUE)
+  
   
   #################### 
   ### Variables transformation ###
