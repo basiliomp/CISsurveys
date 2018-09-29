@@ -1,9 +1,7 @@
-######################
+
 ### Creating a complete voting behaviour variable combining two columns from each
 
-#################### 
-### Set up ###
-#################### 
+# Set up --------------------------------------------
 
 # Loading packages required install.packages("tidyverse", "labelled", "foreign", "haven", "survey", "WriteXLS")
 library(tidyverse)
@@ -21,9 +19,9 @@ setwd(project_root)
 # Reading index database into R
 general <- readxl::read_xlsx("progreso trabajo.xlsx", sheet = "tabla", skip = 1, col_names = T )
 
-#################### 
-### Importing data ###
-#################### 
+
+# Importing data ------------------------------------
+
 
 # For this toy example:
 x <- 116
@@ -72,9 +70,8 @@ CIS3 <- read.spss(file = general[[x, "Savfile"]],
   typeof(CIS3$p18a)
   attributes(CIS3$p18a)
 
-#################### 
-### Variables transformation ###
-#################### 
+
+# Variable transformation ---------------------------
 
 #Visualizacion del cruce que queremos agrupar en la nueva variable de voto
 
