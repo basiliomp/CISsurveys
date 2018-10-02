@@ -10,10 +10,8 @@ library(foreign)
 library(haven)
 library(survey)
 library(WriteXLS)
-devtools::install_github("r-lib/lobstr")
-library(lobstr)
 
-# Set working directory
+# Set your working directory
 project_root <- "D:/Dropbox/AI_ELEC_AUT/Encuestas"
 setwd(project_root)
 # Reading index database into R
@@ -36,39 +34,52 @@ CIS2 <- foreign_to_labelled(read.spss(file = general[[x, "Savfile"]],
                                      to.data.frame = TRUE, 
                                      reencode = 'utf-8',
                                      use.value.labels = TRUE))
+
 CIS3 <- read.spss(file = general[[x, "Savfile"]],
                                       to.data.frame = TRUE, 
                                       reencode = 'utf-8',
                                       use.value.labels = TRUE)
 
-# Import method comparison
+# Import method comparison:
 # So far, CIS2 and CIS3 seem to be equal and less useful than CIS1.
 
 ##################
 # MAIN PROBLEM: DATA OF DIFFERENT TYPES DEPENDING ON HOW WE CALL IT OR SUBSET IT!
 ##################
 
-  # CIS1 analysis (read_spss) <Labelled SPSS double>
-  CIS1[,general[[x, "Voto.reciente"]]]
-  class(CIS1[,general[[x, "Voto.reciente"]]])
-  class(CIS1$p18a)
-  typeof(CIS1[,general[[x, "Voto.reciente"]]])
-  typeof(CIS1$p18a)
-  attributes(CIS1[,general[[x, "Voto.reciente"]]])
-  attributes(CIS1$p18a)
+# Function to perform analysis of the different objects of interest (variables from surveys) and
+# their features, which may change depending on how we call the object.
+
+analyse <- function(object) {
+  #Print the object to analyse
+  print(object)
+  #Print the structure of the object to analyse
+  str(object)
+  #Print the class of the object to analyse
+  class(object)
+  #Print the type of the object to analyse
+  typeof(object)
+  #Print the attributes related to the object to analyse
+  attributes(object)
+}
   
-  # CIS2 analysis (foreign_to_labelled + read.spss)
-  CIS2[,general[[x, "Voto.reciente"]]]
-  str(CIS2[,general[[x, "Voto.reciente"]]])
-  class(CIS2$p18a)
-  typeof(CIS2$p18a)
-  attributes(VIS2$p18a)
-  # CIS3 analysis (read_spss)
-  CIS3[,general[[x, "Voto.reciente"]]]
-  str(CIS3[,general[[x, "Voto.reciente"]]])
-  class(CIS3$p18a)
-  typeof(CIS3$p18a)
-  attributes(CIS3$p18a)
+# CIS1 analysis (read_spss) <Labelled SPSS double>
+  #Testing the object result of subsetting with second level subsetting
+  analyse(CIS1[,general[[x, "Voto.reciente"]]])
+  #Testing the object result of  subsetting with explicit call by variable name
+  analyse(CIS1$p18a)
+  
+# CIS2 analysis (foreign_to_labelled + read.spss)
+  #Testing the object result of  subsetting with second level subsetting
+  analyse(CIS2[,general[[x, "Voto.reciente"]]])
+  #Testing the object result of  subsetting with explicit call by variable name
+  analyse(CIS2$p18a)
+  
+# CIS3 analysis (read.spss)
+  #Testing the object result of  subsetting with second level subsetting
+  analyse(CIS3[,general[[x, "Voto.reciente"]]])
+  #Testing the object result of  subsetting with explicit call by variable name
+  analyse(CIS3$p18a)
 
 
 # Variable transformation ---------------------------
@@ -76,9 +87,8 @@ CIS3 <- read.spss(file = general[[x, "Savfile"]],
 #Visualizacion del cruce que queremos agrupar en la nueva variable de voto
 
 #In the loop it could be useful to extract the variable specification with these assginmnets:
-
-CIS1$"Voto.reciente" <- CIS1[general[[x, "Voto.reciente"]]]
-CIS1$"Otro.reciente" <- CIS1[,general[[x, "Otro.reciente"]]]
+CIS$"Voto.reciente" <- CIS[general[[x, "Voto.reciente"]]]
+CIS$"Otro.reciente" <- CIS[,general[[x, "Otro.reciente"]]]
 "Otro.reciente.valor.voto" <- general[[x, "Otro.reciente.valor.voto"]]
 
 
@@ -116,8 +126,12 @@ CIS[,"Recuerdo.reciente"] <- if_else(condition = CIS[, "Otro.reciente"] == Otro.
                                     true = CIS[, "Voto.reciente"],
                                     false =  if_else(condition = CIS[, "Otro.reciente"] == 9,
                                                 true = "N.C. participacion",
-                                                false = "Abstención"))
-"Error: NA column indexes not supported"
+                                                false = "Abstenc."))
+"Error: NA column indexes not supported" # Using CIS1
+
+"Error in `[.data.frame`(true, rep(NA_integer_, length(condition))) : 
+  undefined columns selected" # Using CIS3
+
 ## The problem is getting the right type of data here while subsetting the rows we want to modify 
 ## or assign to a new vector/variable.
 
@@ -130,8 +144,8 @@ CIS[,"Recuerdo.reciente"] <- if_else(condition = CIS[, "Otro.reciente"] == Otro.
 
 table(CIS1$p15, CIS1$p18a) #Checking the bivariate distribution
 
-case_when(CIS1[, "Otro.reciente"] == Otro.reciente.valor.voto ~ CIS1[, "Voto.reciente"],
-          CIS1[, "Otro.reciente"] == 9 ~ "N.C. participacion")
+case_when(CIS[, "Otro.reciente"] == Otro.reciente.valor.voto ~ CIS[, "Voto.reciente"],
+          CIS[, "Otro.reciente"] == 9 ~ "N.C. participacion")
 "Error: NA column indexes not supported"
 
 # But this one partially works, because the second condition is never applied 
@@ -139,6 +153,12 @@ case_when(CIS1[, "Otro.reciente"] == Otro.reciente.valor.voto ~ CIS1[, "Voto.rec
 case_when(CIS1$p15 == 1 ~ 81,
           CIS1$p15 == 9 ~ 88)
 
+################ Alternative method tidyverse-purrr? ################
+
+cisvoto <- CIS1 %>%
+          replace_na()
+          
+CIS1 <- left_join(CIS1, cisvoto)  
 
 
 #Checking
