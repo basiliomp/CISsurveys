@@ -1,4 +1,4 @@
-### Data manipulation from SPSS: Encuestas electorales autonómicas del CIS
+### Data manipulation from SPSS: Encuestas electorales autonÃ³micas del CIS
 
 # Set up --------------------------------------------------------------
 
@@ -10,7 +10,7 @@ library(haven)
 library(readxl)
 library(survey)
 library(WriteXLS)
-#library(Writexl) # ¿PROBAR ESTE PAQUETE NUEVO?
+#library(Writexl) # Â¿PROBAR ESTE PAQUETE NUEVO?
 
 # Set working directory
 project_root <- "D:/Dropbox/AI_ELEC_AUT/Encuestas"
@@ -20,24 +20,24 @@ setwd(project_root)
 general <- read_xlsx("progreso trabajo.xlsx", sheet= "tabla", skip = 1, col_names = T )
 
 # Comment #####################
-# # Objeto con el listado completo de archivos de trabajo (¡ojo con el working directory activo!)
+# # Objeto con el listado completo de archivos de trabajo (Â¡ojo con el working directory activo!)
 # files <- list.files(full.names = T, recursive = T)
 # 
 # # Listado de ficheros .sav con ruta completa (spss)
-# # El símbolo $ indica que hay que empezar a buscar por el final de la string.
-# # El punto indica que puede venir cualquier símbolo antes de "sav"
+# # El sÃ­mbolo $ indica que hay que empezar a buscar por el final de la string.
+# # El punto indica que puede venir cualquier sÃ­mbolo antes de "sav"
 # savpath <- grep(value = T, pattern = ".sav$", files)
-# savpath <- str_replace(savpath, "^\\.", "") #sin el punto que tenían todas las entradas al inicio.
+# savpath <- str_replace(savpath, "^\\.", "") #sin el punto que tenÃ­an todas las entradas al inicio.
 # 
 # # Listado de rutas donde se encuentran los ficheros .sav
 # savfolders <- str_extract(savpath, "/?[^/]*/?[^/]*/?[^/]*/?[^/]*")
 # 
 # # Listado de los nombres de los ficheros .sav (spss)
-# # El código "[^/]" busca cualquier símbolo excepto "/" empezando por .sav desde el final ($)
+# # El cÃ³digo "[^/]" busca cualquier sÃ­mbolo excepto "/" empezando por .sav desde el final ($)
 # savfiles <- str_extract(string = savpath, pattern = "/[^/]*\\.sav$")
 # 
 # # Token identificador de cada encuesta para identificar archivos derivados
-# # ¿Es necesario esto o vamso a sacar los ficheros usando files?
+# # Â¿Es necesario esto o vamso a sacar los ficheros usando files?
 # general$Token <- paste0("MD", 
 #                        gsub(pattern = ".*/MD|\\.sav.*", replacement = "", x = general$Path))
 # 
@@ -48,8 +48,8 @@ general <- read_xlsx("progreso trabajo.xlsx", sheet= "tabla", skip = 1, col_name
 # regmatches(general$Path, regexpr("[^/]{3}", general$Path))
 # regmatches(general$Path, regexpr("\\w{3}", general$Path)) #Hace lo mismo
 # 
-# # Con replace pattern = "" podría ir eliminando partes del path y almacenando los valores en distintas
-# # columnas del data frame general. Así tendría por separado el tipo de elección, el año, la ComAut, etc.
+# # Con replace pattern = "" podrÃ­a ir eliminando partes del path y almacenando los valores en distintas
+# # columnas del data frame general. AsÃ­ tendrÃ­a por separado el tipo de elecciÃ³n, el aÃ±o, la ComAut, etc.
 # 
 # regmatches(general$Path, regexpr("/?[^/]*/?[^/]*/?[^/]*", general$Path)) #Esto saca tipo elecc + ComAut
 # 
@@ -73,7 +73,7 @@ for (x in 1:nrow(general)) {
 
   # Importing data ------------------------------------------------------
   
-    # Leyendo los datos en formato SPSS en R con la función `foreign`:
+    # Leyendo los datos en formato SPSS en R con la funciÃ³n `foreign`:
     CIS <- foreign_to_labelled(read.spss(file = general[[x, "Savfile"]],
                                          to.data.frame = TRUE, 
                                          reencode='utf-8',
@@ -88,10 +88,10 @@ for (x in 1:nrow(general)) {
   # Variable transformation ---------------------------------------------
   
     # RECUERDO para el voto reciente (no missing values)
-    ## Si el valor de Voto.reciente no está vacío o es un guion, lo asignamos a CIS$RECUERDO
+    ## Si el valor de Voto.reciente no estÃ¡ vacÃ­o o es un guion, lo asignamos a CIS$RECUERDO
     if (!is.na(general[[x,"Voto.reciente"]]) & general[[x,"Voto.reciente"]] != "-") {
         CIS$RECUERDO <- CIS[[general[[x,"Voto.reciente"]]]]
-        #   } else if ("¿cómo debería combinar la variable votoreciente con la complementaria otro.reciente?") {
+        #   } else if ("Â¿cÃ³mo deberÃ­a combinar la variable votoreciente con la complementaria otro.reciente?") {
          "Fue a votar y vot." | "S. que vot." 
         #   CIS$RECUERDO <- CIS[[general[[x,"Otro.reciente"]]]]
         
@@ -99,7 +99,7 @@ for (x in 1:nrow(general)) {
         general[x, "Looperror"] <- print(paste("Lack of VOTO RECIENTE in", general$Token[[x]]))
     }
     
-    # RVOTOAUT para las elecciones autonómicas del ciclo pasado (no missing values)
+    # RVOTOAUT para las elecciones autonÃ³micas del ciclo pasado (no missing values)
     if (!is.na(general[x,"Voto.pasado"])){
         CIS$RVAUTAGR <- CIS[[general[[x,"Voto.pasado"]]]]
       } else {
@@ -127,7 +127,7 @@ for (x in 1:nrow(general)) {
         general[x, "Looperror"] <- print(paste("Lack of EDAD in", general$Token[[x]]))
     }
     
-    # OCUPACIÓN (renombrar)
+    # OCUPACIÃ“N (renombrar)
     if (!is.na(general[x,"Ocupacion"])) {
         CIS$OCUPAAGR <- CIS[[general[[x,"Ocupacion"]]]]
       # } else {
@@ -139,7 +139,7 @@ for (x in 1:nrow(general)) {
     
   # Writing tables into Excel --------------------------------------------
   
-    # Nueva función para darle un título a las tablas de recuerdo de voto
+    # Nueva funciÃ³n para darle un tÃ­tulo a las tablas de recuerdo de voto
     write.table.header <- function(x, file, header){
       cat(header, '\n',  file = file)
       write.table(x= x, file = file, col.names = NA, sep = ";", dec = ",", append = T, row.names = T, na = "")
@@ -149,8 +149,8 @@ for (x in 1:nrow(general)) {
     if (general[x,"Encuesta"] != "post") {
       print("TABLES NOT AVAILABLE")
     } else {
-    # TABLAS COMPARATIVAS CON ELECCIONES AUTONÓMICAS
-    # Aquí difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
+    # TABLAS COMPARATIVAS CON ELECCIONES AUTONÃ“MICAS
+    # AquÃ­ difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
       if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) & general[x,"Encuesta"] == "post") {
       # Declare data to be survey data and weight it accordingly (if needed)
       CISweight <- svydesign(ids= ~1, strata=~CIS[,general[[x,"Estrato"]]],
@@ -173,7 +173,7 @@ for (x in 1:nrow(general)) {
     
     
     # TABLAS COMPARATIVAS CON ELECCIONES GENERALES
-    # Aquí difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
+    # AquÃ­ difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
     if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) & general[x,"Encuesta"] == "post") {
           # Declare data to be survey data and weight it accordingly (if needed)
           CISweight <- svydesign(ids= ~1, strata=~CIS[,general[[x,"Estrato"]]],
@@ -198,7 +198,7 @@ for (x in 1:nrow(general)) {
     #For EXPORTING the data it is better to use haven's function. Labelled data is read correctly by SPSS.
     write_sav(CIS, path = paste("nuevo", general[x,"Savfile"]))
     
-    # Pequeño contador de iteraciones con sello temporal
+    # PequeÃ±o contador de iteraciones con sello temporal
     if (x %% 50 == 0) { 
       paste0("Progress: ", x, " out of ", nrow(general), " iterations completed.")
       timestamp()
