@@ -1,17 +1,17 @@
-# Nueva función para darle un título a las tablas de recuerdo de voto
+# Nueva funciÃ³n para darle un tÃ­tulo a las tablas de recuerdo de voto
 write.table.header <- function(x, file, header){
   cat(header, '\n',  file = file)
   write.table(x= x, file = file, col.names = NA, sep = ";", dec = ",", append = T, row.names = T, na = "")
 }
 
 
-# ¿Esto funciona? ¿Será necesario añadir un segundo argumento a cada función para que `x` sea especificado explícitamente?
+# Â¿Esto funciona? Â¿SerÃ¡ necesario aÃ±adir un segundo argumento a cada funciÃ³n para que `x` sea especificado explÃ­citamente?
 
 #Function for tabulating answers from reported vot on general elections
 generaltab <- function(tab.gen) { 
   #Tabla de transferencias desde pasadas generales absolutas
   write.table.header(x = tab.gen, file = paste(general[x,"Token"], "GEN_abs.csv", sep = "_"), 
-                     header = "Voto reciente (filas) y en pasadas elecciones generales (columnas) en número absolutos")
+                     header = "Voto reciente (filas) y en pasadas elecciones generales (columnas) en nÃºmero absolutos")
   
   #*  #Tabla de transferencias porcentuales desde pasadas generales por fila
   write.table.header(x = round(prop.table(tab.gen, margin = 1), digits = 4)*100, #margin=1 es para % por fila
@@ -28,17 +28,17 @@ generaltab <- function(tab.gen) {
 
 #Function for tabulating answers from reported vot on regional elections
 autonotab <- function(tab.auto) { 
-  #Tabla de transferencias desde pasadas autonómicas en términos absolutos
+  #Tabla de transferencias desde pasadas autonÃ³micas en tÃ©rminos absolutos
   write.table.header(x = tab.auto, file = paste(general[x,"Token"], "AUTO_abs.csv", sep = "_"), 
-                     header = "Voto reciente (filas) y en pasadas elecciones autonómicas (columnas) en número absolutos")
+                     header = "Voto reciente (filas) y en pasadas elecciones autonÃ³micas (columnas) en nÃºmero absolutos")
   
-  #* #Tabla de transferencias porcentuales desde pasadas autonómicas por fila
+  #* #Tabla de transferencias porcentuales desde pasadas autonÃ³micas por fila
   write.table.header(x = round(prop.table(tab.auto, margin = 1), digits = 4)*100, #margin=1 es para % por fila
                      file = paste(general[x,"Token"], "AUTO_perc_fila.csv", sep = "_"), 
-                     header = "Voto reciente (filas) y en pasadas elecciones autonómicas (columnas) en % por fila")
+                     header = "Voto reciente (filas) y en pasadas elecciones autonÃ³micas (columnas) en % por fila")
   
-  #*  #Tabla de transferencias porcentuales desde pasadas autonómicas por columna
+  #*  #Tabla de transferencias porcentuales desde pasadas autonÃ³micas por columna
   write.table.header(x = round(prop.table(tab.auto, margin = 2), digits = 4)*100, #margin=2 es para % por columna
                      file = paste(general[x,"Token"], "AUTO_perc_colu.csv", sep = "_"), 
-                     header = "Voto reciente (filas) y en pasadas elecciones autonómicas (columnas) en % por columnas")
+                     header = "Voto reciente (filas) y en pasadas elecciones autonÃ³micas (columnas) en % por columnas")
 }
