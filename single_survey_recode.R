@@ -95,30 +95,34 @@ CIS$"Otro.reciente" <- CIS[,general[[x, "Otro.reciente"]]]
 # Then, once the variables we want to modify are set, this part of the function would work in a more elegant way:
 table(CIS$Voto.reciente, CIS$Otro.reciente, useNA = "always")
 
-
 # For the next loop to work, I need `CIS` to be a standard data.frame, and not a tibble.
 "https://stackoverflow.com/questions/11612235/select-rows-from-a-data-frame-based-on-values-in-a-vector"
 
 ######################################################
 CIS <- as.data.frame(CIS)
 
-
 ################ Loop proposal for complete voting behaviour ################
 
 #Placeholder
-CIS$Recuerdo.reciente <- 0
+CIS$Recuerdo.reciente <- NA
 
-for (y in 1:length(CIS)) {
-  if (CIS[[y, "Otro.reciente"]] == CIS[[y, "Otro.reciente.valor.voto"]]) {
-    CIS[y, "Recuerdo.reciente"] <- CIS[y, "Voto.reciente"]
+for (y in 1:nrow(CIS)) {
+  if (CIS[y, "Otro.reciente"][[1]] == "Fue a votar y vot.") {
+    CIS[y, "Recuerdo.reciente"][[1]] <- CIS[y, "Voto.reciente"][[1]]
   }
-  }
+  } #*Once that is working, adapt and add these other conditions:
 # else if (CIS[y, "Otro.reciente"] == 9) {
 #     CIS[y, "Recuerdo.reciente"] <- "N.C. participacion"
 #   } else {
 #     CIS[y, "Recuerdo.reciente"] <- "Abstencion"
 #   }
 # }
+
+# Here we can test the result of the loop against the original variable
+table(CIS$Recuerdo.reciente, CIS$p18a)
+# NAs from the original variable have value 0 in the new one because the stay unchanged.
+sum(is.na(CIS$p18a))
+
 
 ################ Alternative method if_else ################
 
