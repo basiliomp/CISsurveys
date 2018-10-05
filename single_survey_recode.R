@@ -84,7 +84,10 @@ analyse <- function(object) {
 
 # Variable transformation ---------------------------
 
-#Visualizacion del cruce que queremos agrupar en la nueva variable de voto
+# Visualization of the two variables we want to consider for the transformation (example for the case in general[116,])
+attributes(CIS1$p15)[5]
+attributes(CIS1$p18a)[5]
+table(CIS1$p15, CIS1$p18a, useNA = "always")
 
 #In the loop it could be useful to extract the variable specification with these assginmnets:
 CIS$"Voto.reciente" <- CIS[general[[x, "Voto.reciente"]]]
