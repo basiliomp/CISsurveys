@@ -90,36 +90,47 @@ attributes(CIS1$p18a)[5]
 table(CIS1$p15, CIS1$p18a, useNA = "always")
 
 #In the loop it could be useful to extract the variable specification with these assginmnets:
-CIS$"Voto.reciente" <- CIS[general[[x, "Voto.reciente"]]]
-CIS$"Otro.reciente" <- CIS[,general[[x, "Otro.reciente"]]]
+CIS <- CIS2
+
+# Assign relevant variable into a dictinctly named new variable # Voto.reciente
+CIS[general[[x, "Voto.reciente"]]]
+CIS$Voto.reciente <- subset(CIS, select = general[[x, "Voto.reciente"]])
+CIS$Voto.reciente <- as_vector(CIS$Voto.reciente)
+
+# Assign relevant variable into a dictinctly named new variable # Otro.reciente
+CIS[,general[[x, "Otro.reciente"]]]
+CIS$Otro.reciente <- subset(CIS, select = general[[x, "Otro.reciente"]])
+CIS$Otro.reciente <- as_vector(CIS$Otro.reciente)
+
+# Assign relevant value into a dictinctly named new variable # Otro.reciente.valor.voto
 "Otro.reciente.valor.voto" <- general[[x, "Otro.reciente.valor.voto"]]
 
-
 # Then, once the variables we want to modify are set, this part of the function would work in a more elegant way:
+table(CIS$p18a, CIS$p25, useNA = "always")
 table(CIS$Voto.reciente, CIS$Otro.reciente, useNA = "always")
 
-# For the next loop to work, I need `CIS` to be a standard data.frame, and not a tibble.
-"https://stackoverflow.com/questions/11612235/select-rows-from-a-data-frame-based-on-values-in-a-vector"
-
-######################################################
-CIS <- as.data.frame(CIS)
+      # # For the next loop to work, I need `CIS` to be a standard data.frame, and not a tibble.
+      # "https://stackoverflow.com/questions/11612235/select-rows-from-a-data-frame-based-on-values-in-a-vector"
+      # 
+      # CIS <- as.data.frame(CIS)
 
 ################ Loop proposal for complete voting behaviour ################
 
 #Placeholder
 CIS$Recuerdo.reciente <- NA
 
+#~#~#~#~#~#~# Need to import labels from Voto.reciente as well for values ~#~#~#~#~#~#~#
 for (y in 1:nrow(CIS)) {
   if (CIS[y, "Otro.reciente"][[1]] == "Fue a votar y vot.") {
     CIS[y, "Recuerdo.reciente"][[1]] <- CIS[y, "Voto.reciente"][[1]]
   }
-  } #*Once that is working, adapt and add these other conditions:
-# else if (CIS[y, "Otro.reciente"] == 9) {
-#     CIS[y, "Recuerdo.reciente"] <- "N.C. participacion"
-#   } else {
-#     CIS[y, "Recuerdo.reciente"] <- "Abstencion"
-#   }
-# }
+  #*Once that is working, adapt and add these other conditions:
+ else if (CIS[y, "Otro.reciente"][[1]] == "N.C.") {
+     CIS[y, "Recuerdo.reciente"][[1]] <- "N.C. participacion"
+   } else {
+    CIS[y, "Recuerdo.reciente"] <- "Abstencion"
+  }
+}
 
 # Here we can test the result of the loop against the original variable
 table(CIS$Recuerdo.reciente, CIS$p18a)
