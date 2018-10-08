@@ -106,7 +106,7 @@ CIS$Otro.reciente <- as_vector(CIS$Otro.reciente)
 "Otro.reciente.valor.voto" <- general[[x, "Otro.reciente.valor.voto"]]
 
 # Then, once the variables we want to modify are set, this part of the function would work in a more elegant way:
-table(CIS$p18a, CIS$p25, useNA = "always")
+table(CIS$p18a, CIS$p15, useNA = "always")
 table(CIS$Voto.reciente, CIS$Otro.reciente, useNA = "always")
 
       # # For the next loop to work, I need `CIS` to be a standard data.frame, and not a tibble.
@@ -117,18 +117,20 @@ table(CIS$Voto.reciente, CIS$Otro.reciente, useNA = "always")
 ################ Loop proposal for complete voting behaviour ################
 
 #Placeholder
-CIS$Recuerdo.reciente <- NA
+CIS$Recuerdo.reciente <- droplevels(CIS$Recuerdo.reciente)
+CIS$Recuerdo.reciente <- factor(x = CIS$Voto.reciente, 
+                                levels = c(attributes(CIS$Voto.reciente)[["levels"]],
+                                           "N.C. participacion", "Abstencion") )
+
 
 #~#~#~#~#~#~# Need to import labels from Voto.reciente as well for values ~#~#~#~#~#~#~#
 for (y in 1:nrow(CIS)) {
   if (CIS[y, "Otro.reciente"][[1]] == "Fue a votar y vot.") {
-    CIS[y, "Recuerdo.reciente"][[1]] <- CIS[y, "Voto.reciente"][[1]]
-  }
-  #*Once that is working, adapt and add these other conditions:
- else if (CIS[y, "Otro.reciente"][[1]] == "N.C.") {
+     CIS[y, "Recuerdo.reciente"][[1]] <- CIS[y, "Voto.reciente"][[1]]
+  } else if (CIS[y, "Otro.reciente"][[1]] == "N.C.") {
      CIS[y, "Recuerdo.reciente"][[1]] <- "N.C. participacion"
-   } else {
-    CIS[y, "Recuerdo.reciente"] <- "Abstencion"
+   } else if (is.na(CIS[y, "Recuerdo.reciente"][[1]])) {
+    CIS[y, "Recuerdo.reciente"][[1]] <- "Abstencion"
   }
 }
 
@@ -160,11 +162,18 @@ CIS[,"Recuerdo.reciente"] <- if_else(condition = CIS[, "Otro.reciente"] == Otro.
 ## The problem is getting the right type of data here while subsetting the rows we want to modify 
 ## or assign to a new vector/variable.
 
-table(CIS1$p15, CIS1$p18a) #Checking the bivariate distribution
+table(CIS1$p15, CIS1$p18a, useNA = "always") #Checking the bivariate distribution
 
-case_when(CIS[, "Otro.reciente"] == Otro.reciente.valor.voto ~ CIS[, "Voto.reciente"],
-          CIS[, "Otro.reciente"] == 9 ~ "N.C. participacion")
+# Partiendo de la base de Otro.reciente
+CIS$Recuerdo.reciente <- case_when(CIS[, "Otro.reciente"][[1]] == "Fue a votar y vot." ~ CIS[, "Voto.reciente"][[1]],
+          CIS[, "Otro.reciente"][[1]] == "S. que vot." ~ CIS[, "Voto.reciente"][[1]],
+          is.na(CIS[, "Otro.reciente"][[1]]) ~ "N.C. participacion")
 "Error: NA column indexes not supported"
+
+# Partiendo de la base de Voto.reciente
+CIS$Recuerdo.reciente <- case_when(CIS[, "Otro.reciente"][[1]] == "N.C." ~ "N.C. participacion",
+                                   is.na(CIS[, "Otro.reciente"][[1]]) ~ "Abstencion")
+
 
 # But this one partially works, because the second condition is never applied 
 # (there are no cases with 88 value once it is run)
