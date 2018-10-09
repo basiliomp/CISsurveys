@@ -12,57 +12,12 @@ library(survey)
 library(WriteXLS)
 #library(Writexl) # ¿PROBAR ESTE PAQUETE NUEVO?
 
-# Set working directory
+# Set your working directory
 project_root <- "D:/Dropbox/AI_ELEC_AUT/Encuestas"
 setwd(project_root)
 
-#Fichero general de trabajo
-general <- read_xlsx("progreso trabajo.xlsx", sheet= "tabla", skip = 1, col_names = T )
-
-# Comment #####################
-# # Objeto con el listado completo de archivos de trabajo (¡ojo con el working directory activo!)
-# files <- list.files(full.names = T, recursive = T)
-# 
-# # Listado de ficheros .sav con ruta completa (spss)
-# # El símbolo $ indica que hay que empezar a buscar por el final de la string.
-# # El punto indica que puede venir cualquier símbolo antes de "sav"
-# savpath <- grep(value = T, pattern = ".sav$", files)
-# savpath <- str_replace(savpath, "^\\.", "") #sin el punto que tenían todas las entradas al inicio.
-# 
-# # Listado de rutas donde se encuentran los ficheros .sav
-# savfolders <- str_extract(savpath, "/?[^/]*/?[^/]*/?[^/]*/?[^/]*")
-# 
-# # Listado de los nombres de los ficheros .sav (spss)
-# # El código "[^/]" busca cualquier símbolo excepto "/" empezando por .sav desde el final ($)
-# savfiles <- str_extract(string = savpath, pattern = "/[^/]*\\.sav$")
-# 
-# # Token identificador de cada encuesta para identificar archivos derivados
-# # ¿Es necesario esto o vamso a sacar los ficheros usando files?
-# general$Token <- paste0("MD", 
-#                        gsub(pattern = ".*/MD|\\.sav.*", replacement = "", x = general$Path))
-# 
-# pattern = "/[^/]*\\.sav$"  # ! # ! # ! 
-# 
-# # Ruta en el sistema de archivos donde leer y guardar los datos de cada encuesta
-# #Con esto extraes los tres caracteres del tipo de convocatoria
-# regmatches(general$Path, regexpr("[^/]{3}", general$Path))
-# regmatches(general$Path, regexpr("\\w{3}", general$Path)) #Hace lo mismo
-# 
-# # Con replace pattern = "" podría ir eliminando partes del path y almacenando los valores en distintas
-# # columnas del data frame general. Así tendría por separado el tipo de elección, el año, la ComAut, etc.
-# 
-# regmatches(general$Path, regexpr("/?[^/]*/?[^/]*/?[^/]*", general$Path)) #Esto saca tipo elecc + ComAut
-# 
-# general$Route <- regmatches(general$Path, regexpr("/?[^/]*/?[^/]*/?[^/]*/?[^/]*", general$Path)) # Path de carpeta encuesta
-# 
-# regmatches(general$Path, regexpr("/?[^/]*/?[^/]*/?[^/]*/?[^/]*/?[^/]*", general$Path)) # Path for Sav file
-# 
-# general$Folder <- paste("MD", 
-#                        gsub(pattern = ".*/MD|\\.sav.*", replacement = "", x = general$Path),
-#                        sep = "")
-
-
-
+# Reading index database into R
+general <- readxl::read_xlsx("progreso trabajo.xlsx", sheet = "tabla", skip = 1, col_names = T )
 
 # Loop ----------------------------------------------------------------
 
@@ -73,18 +28,12 @@ for (x in 1:nrow(general)) {
 
   # Importing data ------------------------------------------------------
   
-    # Leyendo los datos en formato SPSS en R con la función `foreign`:
+    # Reading survey data from SPSS into R with `foreign`. Alternatively: haven::read_spss(file = general[[x, "Savfile"]], user_na = TRUE)
     CIS <- foreign_to_labelled(read.spss(file = general[[x, "Savfile"]],
                                          to.data.frame = TRUE, 
                                          reencode='utf-8',
                                          use.value.labels = TRUE))
-    
-    
-    #Alternatively
-    #CIS <- read_spss(file = general[[x, "Savfile"]], user_na = TRUE)
-    
-    
-  
+
   # Variable transformation ---------------------------------------------
   
     # RECUERDO para el voto reciente (no missing values)
@@ -127,7 +76,7 @@ for (x in 1:nrow(general)) {
         general[x, "Looperror"] <- print(paste("Lack of EDAD in", general$Token[[x]]))
     }
     
-    # OCUPACIÓN (renombrar)
+    # OCUPACION (renombrar)
     if (!is.na(general[x,"Ocupacion"])) {
         CIS$OCUPAAGR <- CIS[[general[[x,"Ocupacion"]]]]
       # } else {
@@ -198,7 +147,7 @@ for (x in 1:nrow(general)) {
     #For EXPORTING the data it is better to use haven's function. Labelled data is read correctly by SPSS.
     write_sav(CIS, path = paste("nuevo", general[x,"Savfile"]))
     
-    # Pequeño contador de iteraciones con sello temporal
+    # Contador de iteraciones con sello temporal
     if (x %% 50 == 0) { 
       paste0("Progress: ", x, " out of ", nrow(general), " iterations completed.")
       timestamp()

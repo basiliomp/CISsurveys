@@ -10,6 +10,7 @@ library(foreign)
 library(haven)
 library(survey)
 library(WriteXLS)
+library(surveydata)
 
 # Set your working directory
 project_root <- "D:/Dropbox/AI_ELEC_AUT/Encuestas"
@@ -17,179 +18,39 @@ setwd(project_root)
 # Reading index database into R
 general <- readxl::read_xlsx("progreso trabajo.xlsx", sheet = "tabla", skip = 1, col_names = T )
 
-
 # Importing data ------------------------------------
 
-
-# For this toy example:
-x <- 116
-
-# Setting working directory for current survey file
-setwd(paste0(project_root, general[x, "Folder"]))
-
-# Choose import method!
-CIS1 <- read_spss(file = general[[x, "Savfile"]], user_na = TRUE)
-
-CIS2 <- foreign_to_labelled(read.spss(file = general[[x, "Savfile"]],
-                                     to.data.frame = TRUE, 
-                                     reencode = 'utf-8',
-                                     use.value.labels = TRUE))
-
-CIS3 <- read.spss(file = general[[x, "Savfile"]],
-                                      to.data.frame = TRUE, 
-                                      reencode = 'utf-8',
-                                      use.value.labels = TRUE)
-
-# Import method comparison:
-# So far, CIS2 and CIS3 seem to be equal and less useful than CIS1.
-
-##################
-# MAIN PROBLEM: DATA OF DIFFERENT TYPES DEPENDING ON HOW WE CALL IT OR SUBSET IT!
-##################
-
-# Function to perform analysis of the different objects of interest (variables from surveys) and
-# their features, which may change depending on how we call the object.
-
-analyse <- function(object) {
-  #Print the object to analyse
-  print(object)
-  #Print the structure of the object to analyse
-  str(object)
-  #Print the class of the object to analyse
-  class(object)
-  #Print the type of the object to analyse
-  typeof(object)
-  #Print the attributes related to the object to analyse
-  attributes(object)
-}
+recuerdodevoto <- function(x) {
+  # Setting working directory for current survey file
+  setwd(paste0(project_root, general[x, "Folder"]))
   
-# CIS1 analysis (read_spss) <Labelled SPSS double>
-  #Testing the object result of subsetting with second level subsetting
-  analyse(CIS1[,general[[x, "Voto.reciente"]]])
-  #Testing the object result of  subsetting with explicit call by variable name
-  analyse(CIS1$p18a)
+  CIS <- foreign_to_labelled(read.spss(file = general[[x, "Savfile"]],
+                                       to.data.frame = TRUE, 
+                                       reencode = 'utf-8',
+                                       use.value.labels = TRUE))
   
-# CIS2 analysis (foreign_to_labelled + read.spss)
-  #Testing the object result of  subsetting with second level subsetting
-  analyse(CIS2[,general[[x, "Voto.reciente"]]])
-  #Testing the object result of  subsetting with explicit call by variable name
-  analyse(CIS2$p18a)
+  # Assign relevant variable into a dictinctly named new variable # Voto.reciente
+  CIS$Voto.reciente <- subset(CIS, select = general[[x, "Voto.reciente"]])
+  CIS$Voto.reciente <- as_vector(CIS$Voto.reciente)
   
-# CIS3 analysis (read.spss)
-  #Testing the object result of  subsetting with second level subsetting
-  analyse(CIS3[,general[[x, "Voto.reciente"]]])
-  #Testing the object result of  subsetting with explicit call by variable name
-  analyse(CIS3$p18a)
-
-
-# Variable transformation ---------------------------
-
-# Visualization of the two variables we want to consider for the transformation (example for the case in general[116,])
-attributes(CIS1$p15)[5]
-attributes(CIS1$p18a)[5]
-table(CIS1$p15, CIS1$p18a, useNA = "always")
-
-#In the loop it could be useful to extract the variable specification with these assginmnets:
-CIS <- CIS2
-
-# Assign relevant variable into a dictinctly named new variable # Voto.reciente
-CIS[general[[x, "Voto.reciente"]]]
-CIS$Voto.reciente <- subset(CIS, select = general[[x, "Voto.reciente"]])
-CIS$Voto.reciente <- as_vector(CIS$Voto.reciente)
-
-# Assign relevant variable into a dictinctly named new variable # Otro.reciente
-CIS[,general[[x, "Otro.reciente"]]]
-CIS$Otro.reciente <- subset(CIS, select = general[[x, "Otro.reciente"]])
-CIS$Otro.reciente <- as_vector(CIS$Otro.reciente)
-
-# Assign relevant value into a dictinctly named new variable # Otro.reciente.valor.voto
-"Otro.reciente.valor.voto" <- general[[x, "Otro.reciente.valor.voto"]]
-
-# Then, once the variables we want to modify are set, this part of the function would work in a more elegant way:
-table(CIS$p18a, CIS$p15, useNA = "always")
-table(CIS$Voto.reciente, CIS$Otro.reciente, useNA = "always")
-
-      # # For the next loop to work, I need `CIS` to be a standard data.frame, and not a tibble.
-      # "https://stackoverflow.com/questions/11612235/select-rows-from-a-data-frame-based-on-values-in-a-vector"
-      # 
-      # CIS <- as.data.frame(CIS)
-
-################ Loop proposal for complete voting behaviour ################
-
-#Placeholder
-CIS$Recuerdo.reciente <- droplevels(CIS$Recuerdo.reciente)
-CIS$Recuerdo.reciente <- factor(x = CIS$Voto.reciente, 
-                                levels = c(attributes(CIS$Voto.reciente)[["levels"]],
-                                           "N.C. participacion", "Abstencion") )
-
-
-#~#~#~#~#~#~# Need to import labels from Voto.reciente as well for values ~#~#~#~#~#~#~#
-for (y in 1:nrow(CIS)) {
-  if (CIS[y, "Otro.reciente"][[1]] == "Fue a votar y vot.") {
-     CIS[y, "Recuerdo.reciente"][[1]] <- CIS[y, "Voto.reciente"][[1]]
-  } else if (CIS[y, "Otro.reciente"][[1]] == "N.C.") {
-     CIS[y, "Recuerdo.reciente"][[1]] <- "N.C. participacion"
-   } else if (is.na(CIS[y, "Recuerdo.reciente"][[1]])) {
-    CIS[y, "Recuerdo.reciente"][[1]] <- "Abstencion"
+  # Assign relevant variable into a dictinctly named new variable # Otro.reciente
+  CIS$Otro.reciente <- subset(CIS, select = general[[x, "Otro.reciente"]])
+  CIS$Otro.reciente <- as_vector(CIS$Otro.reciente)
+  
+  CIS$Recuerdo.reciente <- as.character(levels(CIS$Voto.reciente))[1]
+  
+  # Loop proposal for complete voting behaviour	# Loop proposal for complete voting behaviour
+  for (y in 1:nrow(CIS)) {
+    if (CIS[y, "Otro.reciente"][[1]] == "Fue a votar y vot.") {
+      CIS[y, "Recuerdo.reciente"][[1]] <- as.character(CIS[y, "Voto.reciente"][[1]])
+    } else if (CIS[y, "Otro.reciente"][[1]] == "S. que vot.") {  
+      CIS[y, "Recuerdo.reciente"][[1]] <- as.character(CIS[y, "Voto.reciente"][[1]])
+    } else if (CIS[y, "Otro.reciente"] == "N.C.") {
+      CIS[y, "Recuerdo.reciente"][[1]] <- "N.C. participacion"
+    } else {
+      CIS[y, "Recuerdo.reciente"][[1]] <- "Abstencion"
+    }
   }
+  
+  table(CIS$Recuerdo.reciente, CIS$Voto.reciente, useNA = "always")
 }
-
-# Here we can test the result of the loop against the original variable
-table(CIS$Recuerdo.reciente, CIS$p18a)
-# NAs from the original variable have value 0 in the new one because the stay unchanged.
-sum(is.na(CIS$p18a))
-
-
-################ Alternative method if_else ################
-
-CIS[,"Recuerdo.reciente"] <- if_else(condition = CIS[, "Otro.reciente"] == Otro.reciente.valor.voto, 
-                                    true = CIS[, "Voto.reciente"],
-                                    false =  if_else(condition = CIS[, "Otro.reciente"] == 9,
-                                                true = "N.C. participacion",
-                                                false = "Abstenc."))
-"Error: NA column indexes not supported" # Using CIS1
-
-"Error in `[.data.frame`(true, rep(NA_integer_, length(condition))) : 
-  undefined columns selected" # Using CIS3
-
-## The problem is getting the right type of data here while subsetting the rows we want to modify 
-## or assign to a new vector/variable.
-
-
-################ Alternative method case_when ################
-
-## The function `case_when` allows for several rules to be applied in order over a vector.
-## The problem is getting the right type of data here while subsetting the rows we want to modify 
-## or assign to a new vector/variable.
-
-table(CIS1$p15, CIS1$p18a, useNA = "always") #Checking the bivariate distribution
-
-# Partiendo de la base de Otro.reciente
-CIS$Recuerdo.reciente <- case_when(CIS[, "Otro.reciente"][[1]] == "Fue a votar y vot." ~ CIS[, "Voto.reciente"][[1]],
-          CIS[, "Otro.reciente"][[1]] == "S. que vot." ~ CIS[, "Voto.reciente"][[1]],
-          is.na(CIS[, "Otro.reciente"][[1]]) ~ "N.C. participacion")
-"Error: NA column indexes not supported"
-
-# Partiendo de la base de Voto.reciente
-CIS$Recuerdo.reciente <- case_when(CIS[, "Otro.reciente"][[1]] == "N.C." ~ "N.C. participacion",
-                                   is.na(CIS[, "Otro.reciente"][[1]]) ~ "Abstencion")
-
-
-# But this one partially works, because the second condition is never applied 
-# (there are no cases with 88 value once it is run)
-case_when(CIS1$p15 == 1 ~ 81,
-          CIS1$p15 == 9 ~ 88)
-
-################ Alternative method tidyverse-purrr? ################
-
-cisvoto <- CIS1 %>%
-          replace_na()
-          
-CIS1 <- left_join(CIS1, cisvoto)  
-
-
-#Checking
-CIS$Recuerdo.reciente
-levels(CIS$Recuerdo.reciente)
-table(CIS$Recuerdo.reciente, CIS$Voto.reciente, useNA = "always")
-
