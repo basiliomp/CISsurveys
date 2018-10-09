@@ -10,7 +10,7 @@ library(haven)
 library(readxl)
 library(survey)
 library(WriteXLS)
-#library(Writexl) # ¿PROBAR ESTE PAQUETE NUEVO?
+#library(Writexl) # Is it better?
 
 # Set your working directory
 project_root <- "D:/Dropbox/AI_ELEC_AUT/Encuestas"
@@ -36,26 +36,25 @@ for (x in 1:nrow(general)) {
   
   # Variable transformation ---------------------------------------------
   
-  # RECUERDO para el voto reciente (no missing values)
-  ## Si el valor de Voto.reciente no está vacío o es un guion, lo asignamos a CIS$RECUERDO
-  if (!is.na(general[[x,"Voto.reciente"]]) & general[[x,"Voto.reciente"]] != "-") {
-    CIS$RECUERDO <- CIS[[general[[x,"Voto.reciente"]]]]
-    #   } else if ("¿cómo debería combinar la variable votoreciente con la complementaria otro.reciente?") {
+  # RECUERDO para el voto reciente (*no missing values*)
+  ## If Voto.reciente is not empty or "-", it is assigned to CIS$RECUERDO
+  if (!is.na(general[[x,"Otro.reciente"]])) {
+    recuerdovoto_completo(x)
+     } else if (!is.na(general[[x,"Voto.reciente"]]) & general[[x,"Voto.reciente"]] != "-") {
     "Fue a votar y vot." | "S. que vot." 
-    #   CIS$RECUERDO <- CIS[[general[[x,"Otro.reciente"]]]]
-    
-  }  else {
+     CIS$RECUERDO <- CIS[[general[[x,"Voto.reciente"]]]]
+      }  else {
     general[x, "Looperror"] <- print(paste("Lack of VOTO RECIENTE in", general$Token[[x]]))
   }
   
-  # RVOTOAUT para las elecciones autonómicas del ciclo pasado (no missing values)
+  # RVOTOAUT para las elecciones autonomicas del ciclo pasado (*no missing values*)
   if (!is.na(general[x,"Voto.pasado"])) {
     CIS$RVAUTAGR <- CIS[[general[[x,"Voto.pasado"]]]]
   } else {
     general[x, "Looperror"] <- print(paste("Lack of VOTO PASADO in", general$Token[[x]]))
   }
   
-  # # RVOTOGEN para las elecciones generales del ciclo pasado (no missing values)
+  # # RVOTOGEN para las elecciones generales del ciclo pasado (*no missing values*)
   if (!is.na(general[x,"Voto.generales"])) {
     CIS$RVGENAGR <- CIS[[general[[x,"Voto.generales"]]]]
   } else {
@@ -88,7 +87,7 @@ for (x in 1:nrow(general)) {
   
   # Writing tables into Excel --------------------------------------------
   
-  # Nueva función para darle un título a las tablas de recuerdo de voto
+  # Table header function for voting behaviour tables
   write.table.header <- function(x, file, header){
     cat(header, '\n',  file = file)
     write.table(x = x, file = file, col.names = NA, sep = ";", dec = ",", append = T, row.names = T, na = "")
@@ -98,8 +97,8 @@ for (x in 1:nrow(general)) {
   if (general[x,"Encuesta"] != "post") {
     print("TABLES NOT AVAILABLE")
   } else {
-    # TABLAS COMPARATIVAS CON ELECCIONES AUTONÓMICAS
-    # Aquí difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
+    # TABLAS COMPARATIVAS CON ELECCIONES AUTONOMICAS
+    # Aqui difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
     if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) & general[x,"Encuesta"] == "post") {
       # Declare data to be survey data and weight it accordingly (if needed)
       CISweight <- svydesign(ids =  ~1, strata = ~CIS[,general[[x,"Estrato"]]],
@@ -122,7 +121,7 @@ for (x in 1:nrow(general)) {
   
   
   # TABLAS COMPARATIVAS CON ELECCIONES GENERALES
-  # Aquí difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
+  # Aqui difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
   if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) & general[x,"Encuesta"] == "post") {
     # Declare data to be survey data and weight it accordingly (if needed)
     CISweight <- svydesign(ids =  ~1, strata = ~CIS[,general[[x,"Estrato"]]],

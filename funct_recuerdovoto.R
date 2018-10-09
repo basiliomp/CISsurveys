@@ -2,6 +2,14 @@ recuerdovoto_completo <- function(x) {
 ### Creating a complete voting behaviour variable combining two columns from each
 # For this project usage only!
 # This is not a general application function, and will not work out of the CISsurvey project.
+  # Setting working directory for current survey file
+  setwd(paste0(project_root, general[x, "Folder"]))
+  
+    # Reading survey data from SPSS into R with `foreign`. Alternatively: haven::read_spss(file = general[[x, "Savfile"]], user_na = TRUE)
+  CIS <- foreign_to_labelled(read.spss(file = general[[x, "Savfile"]],
+                                       to.data.frame = TRUE, 
+                                       reencode = 'utf-8',
+                                       use.value.labels = TRUE))
   
   # Assign relevant variable into a dictinctly named new variable # Voto.reciente
   CIS$Voto.reciente <- subset(CIS, select = general[[x, "Voto.reciente"]])
@@ -26,4 +34,6 @@ recuerdovoto_completo <- function(x) {
     }
   }
   table(CIS$RECUERDO, CIS$Voto.reciente, useNA = "always")
+  return(CIS$RECUERDO)
 }
+View(general)
