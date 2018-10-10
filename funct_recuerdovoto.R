@@ -2,7 +2,8 @@ recuerdovoto_completo <- function(x) {
 ### Creating a complete voting behaviour variable combining two columns from each
 # For this project usage only!
 # This is not a general application function, and will not work out of the CISsurvey project.
-  # Setting working directory for current survey file
+
+    # Setting working directory for current survey file
   setwd(paste0(project_root, general[x, "Folder"]))
   
     # Reading survey data from SPSS into R with `foreign`. Alternatively: haven::read_spss(file = general[[x, "Savfile"]], user_na = TRUE)
@@ -19,21 +20,27 @@ recuerdovoto_completo <- function(x) {
   CIS$Otro.reciente <- subset(CIS, select = general[[x, "Otro.reciente"]])
   CIS$Otro.reciente <- as_vector(CIS$Otro.reciente)
   
-  CIS$RECUERDO <- as.character(levels(CIS$Voto.reciente))[1]
+  CIS$RECUERDO <- factor(x = 0, levels = c(levels(CIS$Voto.reciente), 
+                                           levels(CIS$Otro.reciente)[1:length(levels(CIS$Otro.reciente))-1],
+                                           "Abstencion", "N.C. participacion") )
   
   # Loop proposal for complete voting behaviour	# Loop proposal for complete voting behaviour
   for (y in 1:nrow(CIS)) {
     if (CIS[y, "Otro.reciente"][[1]] == "Fue a votar y vot.") {
-      CIS[y, "RECUERDO"][[1]] <- as.character(CIS[y, "Voto.reciente"][[1]])
+      CIS[y, "RECUERDO"][[1]] <- (CIS[y, "Voto.reciente"][[1]])
     } else if (CIS[y, "Otro.reciente"][[1]] == "S. que vot.") {  
-      CIS[y, "RECUERDO"][[1]] <- as.character(CIS[y, "Voto.reciente"][[1]])
+      CIS[y, "RECUERDO"][[1]] <- (CIS[y, "Voto.reciente"][[1]])
     } else if (CIS[y, "Otro.reciente"] == "N.C.") {
       CIS[y, "RECUERDO"][[1]] <- "N.C. participacion"
     } else {
       CIS[y, "RECUERDO"][[1]] <- "Abstencion"
     }
   }
+  CIS$RECUERDO <- droplevels(CIS$RECUERDO)
+  
   table(CIS$RECUERDO, CIS$Voto.reciente, useNA = "always")
-  return(CIS$RECUERDO)
+}      
+ 
+for (x in 1:nrow(general)) { #test
+  recuerdovoto_completo(x)
 }
-View(general)
