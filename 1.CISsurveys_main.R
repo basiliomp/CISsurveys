@@ -39,11 +39,10 @@ for (x in 1:nrow(general)) {
   # RECUERDO para el voto reciente (*no missing values*)
   ## If Voto.reciente is not empty or "-", it is assigned to CIS$RECUERDO
   if (!is.na(general[[x,"Otro.reciente"]])) {
-    recuerdovoto_completo(x)
+    recuerdovoto_completo(x) #Creates a new voting behaviour variable with no missing values: CIS$RECUERDO
      } else if (!is.na(general[[x,"Voto.reciente"]]) & general[[x,"Voto.reciente"]] != "-") {
-    "Fue a votar y vot." | "S. que vot." 
-     CIS$RECUERDO <- CIS[[general[[x,"Voto.reciente"]]]]
-      }  else {
+       CIS$RECUERDO <- CIS[[general[[x,"Voto.reciente"]]]]
+       }  else {
     general[x, "Looperror"] <- print(paste("Lack of VOTO RECIENTE in", general$Token[[x]]))
   }
   
