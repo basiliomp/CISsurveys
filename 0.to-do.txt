@@ -20,18 +20,14 @@ OCUPACIÓN: situación laboral de la persona entrevistada.
 
 ----
 ☑ ~~Redactar una to do list.~~
-
 ☑ Combinei the variables 'Recuerdo.reciente' & 'Otro.recuerdo' in order to get a new variable capturing all the possible answers regarding interveews voting behaviour. 
-
-☑ *Same for voring intention??* That would imply:
+☐ *Same for voting intention??* That would imply:
       1. Check the question in each survey recording voting intention (manually from reading PDFs and into 'general' table)
       2. Assess how homogeneus is the result, and accordingly think the way to formalise a function/loop.
       3. Assign it a meaningful complete name.
       4. Integrate that into the main loop.
-
 ☐ Add to code a way to capture a 'year reference' for voting behaviour variables.
-
-☐ Revisar el funcionamiento de las tablas y su export a Excel.
-    ☐ Probar si es mejor usar el paquete "WriteXLS" en la export de tablas. 
-
-☐ Revisar los resultados exportados en SPSS.
+☐ Check the tables created by the code and how they look in MS Excel.
+    ☐ If possible, consider the pros and cons of using the package "WriteXLS" in this process. 
+☐ Check weights in relative frequency tables.
+☐ Check the file structure (remove any "*.Rhistory" file).
