@@ -20,7 +20,18 @@ OCUPACIÓN: situación laboral de la persona entrevistada.
 
 ----
 ☑ ~~Redactar una to do list.~~
-☑ Combinar las variables de 'Recuerdo.reciente' y 'Otro.recuerdo' de manera adecuada en la variable nueva RV, que deberá incluir los n.s./n-.c. de cada una de las variables de las que se nutre.
-☐ Añadir en el código la referencia del año para los nombre de las variables sobre recuerdo de voto.
-☐ Revisar el funcionamiento de las tablas y su exportación a Excel.
+
+☑ Combinei the variables 'Recuerdo.reciente' & 'Otro.recuerdo' in order to get a new variable capturing all the possible answers regarding interveews voting behaviour. 
+
+☑ *Same for voring intention??* That would imply:
+      1. Check the question in each survey recording voting intention (manually from reading PDFs and into 'general' table)
+      2. Assess how homogeneus is the result, and accordingly think the way to formalise a function/loop.
+      3. Assign it a meaningful complete name.
+      4. Integrate that into the main loop.
+
+☐ Add to code a way to capture a 'year reference' for voting behaviour variables.
+
+☐ Revisar el funcionamiento de las tablas y su export a Excel.
+    ☐ Probar si es mejor usar el paquete "WriteXLS" en la export de tablas. 
+
 ☐ Revisar los resultados exportados en SPSS.
