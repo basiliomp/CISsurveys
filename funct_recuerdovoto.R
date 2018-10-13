@@ -1,17 +1,10 @@
-recuerdovoto_completo <- function(x) {  
+
+# Code for main loop --------------
+
 ### Creating a complete voting behaviour variable combining two columns from each
 # For this project usage only!
 # This is not a general application function, and will not work out of the CISsurvey project.
-
-    # Setting working directory for current survey file
-  setwd(paste0(project_root, general[x, "Folder"]))
-  
-    # Reading survey data from SPSS into R with `foreign`. Alternatively: haven::read_spss(file = general[[x, "Savfile"]], user_na = TRUE)
-  CIS <- foreign_to_labelled(read.spss(file = general[[x, "Savfile"]],
-                                       to.data.frame = TRUE, 
-                                       reencode = 'utf-8',
-                                       use.value.labels = TRUE))
-  
+if (!is.na(general[[x,"Otro.reciente"]])) {
   # Assign relevant variable into a dictinctly named new variable # Voto.reciente
   CIS$Voto.reciente <- subset(CIS, select = general[[x, "Voto.reciente"]])
   CIS$Voto.reciente <- as_vector(CIS$Voto.reciente)
@@ -20,27 +13,43 @@ recuerdovoto_completo <- function(x) {
   CIS$Otro.reciente <- subset(CIS, select = general[[x, "Otro.reciente"]])
   CIS$Otro.reciente <- as_vector(CIS$Otro.reciente)
   
-  CIS$RECUERDO <- factor(x = 0, levels = c(levels(CIS$Voto.reciente), 
-                                           levels(CIS$Otro.reciente)[1:length(levels(CIS$Otro.reciente))-1],
-                                           "Abstencion", "N.C. participacion") )
+  #Apply the tailored function in order to get a complete voting behaviour variable
+  CIS <- recuerdovoto_completo(df = CIS)
+}
+
+
+# Function ------------------------
+
+recuerdovoto_completo <- function(df) {  #recuerdovoto_completo(CIS)
   
-  # Loop proposal for complete voting behaviour	# Loop proposal for complete voting behaviour
-  for (y in 1:nrow(CIS)) {
-    if (CIS[y, "Otro.reciente"][[1]] == "Fue a votar y vot.") {
-      CIS[y, "RECUERDO"][[1]] <- (CIS[y, "Voto.reciente"][[1]])
-    } else if (CIS[y, "Otro.reciente"][[1]] == "S. que vot.") {  
-      CIS[y, "RECUERDO"][[1]] <- (CIS[y, "Voto.reciente"][[1]])
-    } else if (CIS[y, "Otro.reciente"] == "N.C.") {
-      CIS[y, "RECUERDO"][[1]] <- "N.C. participacion"
+  RECUERDO <- factor(x = 0, levels = c(levels(df$Voto.reciente), 
+                                           levels(df$Otro.reciente)[1:length(levels(df$Otro.reciente))-1],
+                                           "Abstencion", "N.C. participacion") )
+  #The code works until here. Then :
+  # Error in if (CIS[y, "Otro.reciente"][[1]] == "Fue a votar y vot.") { : 
+  # missing value where TRUE/FALSE needed
+  
+  # Loop proposal for complete voting behaviour
+  for (y in 1:nrow(df)) {
+    if (is.na(df[y, "Otro.reciente"][[1]]) == TRUE) {
+      df[y, "RECUERDO"][[1]] <- NA
+    } else if (df[y, "Otro.reciente"][[1]] == "Fue a votar y vot.") {
+      df[y, "RECUERDO"][[1]] <- (df[y, "Voto.reciente"][[1]])
+    } else if (df[y, "Otro.reciente"][[1]] == "S. que vot.") {  
+      df[y, "RECUERDO"][[1]] <- (df[y, "Voto.reciente"][[1]])
+    } else if (df[y, "Otro.reciente"] == "N.C.") {
+      df[y, "RECUERDO"][[1]] <- "N.C. participacion"
     } else {
-      CIS[y, "RECUERDO"][[1]] <- "Abstencion"
+      df[y, "RECUERDO"][[1]] <- "Abstencion"
     }
   }
-  CIS$RECUERDO <- droplevels(CIS$RECUERDO)
+  df$RECUERDO <- droplevels(df$RECUERDO)
   
-  table(CIS$RECUERDO, CIS$Voto.reciente, useNA = "always")
+  print(table(df$RECUERDO, df$Voto.reciente, useNA = "always"))
+  
+  return(df)
 }      
  
-for (x in 1:nrow(general)) { #test
-  recuerdovoto_completo(x)
-}
+#test
+recuerdovoto_completo(CIS)
+

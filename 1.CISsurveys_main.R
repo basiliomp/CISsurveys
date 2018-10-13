@@ -18,6 +18,8 @@ setwd(project_root)
 
 # Reading index database into R
 general <- readxl::read_xlsx("progreso trabajo.xlsx", sheet = "tabla", skip = 1, col_names = T )
+# Special case surveys are pulled out of the main analysis
+general <- filter(general, (!is.na(general$Token)))
 
 # Loop ----------------------------------------------------------------
 
@@ -39,8 +41,18 @@ for (x in 1:nrow(general)) {
   # RECUERDO para el voto reciente (*no missing values*)
   ## If Voto.reciente is not empty or "-", it is assigned to CIS$RECUERDO
   if (!is.na(general[[x,"Otro.reciente"]])) {
-    recuerdovoto_completo(x) #Creates a new voting behaviour variable with no missing values: CIS$RECUERDO
-     } else if (!is.na(general[[x,"Voto.reciente"]]) & general[[x,"Voto.reciente"]] != "-") {
+    # Assign relevant variable into a dictinctly named new variable # Voto.reciente
+    CIS$Voto.reciente <- subset(CIS, select = general[[x, "Voto.reciente"]])
+    CIS$Voto.reciente <- as_vector(CIS$Voto.reciente)
+    
+    # Assign relevant variable into a dictinctly named new variable # Otro.reciente
+    CIS$Otro.reciente <- subset(CIS, select = general[[x, "Otro.reciente"]])
+    CIS$Otro.reciente <- as_vector(CIS$Otro.reciente)
+    
+    #Apply the tailored function in order to get a complete voting behaviour variable
+    CIS <- recuerdovoto_completo(df = CIS)
+    
+    } else if (!is.na(general[[x,"Voto.reciente"]]) & general[[x,"Voto.reciente"]] != "-") {
        CIS$RECUERDO <- CIS[[general[[x,"Voto.reciente"]]]]
        }  else {
     general[x, "Looperror"] <- print(paste("Lack of VOTO RECIENTE in", general$Token[[x]]))
