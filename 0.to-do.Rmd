@@ -4,10 +4,16 @@ Cada encuesta debe contener, cuando disponga de los datos pertinentes, de variab
 de la misma elección en el periodo anterior y de la elección autonómica/general anterior.
 
 Estas variables deben denominarse con las siguientes reglas:
+
 RV - Para indicar Recuerdo de Voto o INTENción de voto.
+
 AUT - Para indicar si se trata de unas elecciones AUTonómicas o GENerales.
+
 XX - Para indicar el año de esas elecciones
-AGR - Para señalar todas las variables que han sido agregadas en nuestro trabajo y no proceden directamente del fichero proporcionado por el CIS.
+
+AGR - Para señalar todas las variables que han sido agregadas en nuestro trabajo y no proceden directamente del fichero proporcionado 
+por el CIS.
+
 Así, la variable de recuerdo de voto autonómico para unas elecciones celebradas en 2011 se denominaría 'RVAUT11AGR'.
 
 Las variables solicitadas son:
@@ -25,16 +31,17 @@ Las variables solicitadas son:
 **OCUPACIÓN**: situación laboral de la persona entrevistada.
 
 ----
-☑ ~~Redactar una to do list.~~
+☑ Redactar una to do list.
 
 ☑ Combine the variables 'Recuerdo.reciente' & 'Otro.recuerdo' in order to get a new variable capturing all the possible answers regarding interveews voting behaviour.
 
 ☐ *Same for voting intention??* That would imply:
-      ~~1. Check the question in each survey recording voting intention (manually from reading PDFs and into 'general' table)~~
       
-      ~~2. Assess how homogeneus is the result, and accordingly think the way to formalise a function/loop.~~
+     🗸 1. Check the question in each survey recording voting intention (manually from reading PDFs and into 'general' table)
       
-      ~~3. Assign it a meaningful complete name.~~
+     🗸 2. Assess how homogeneus is the result, and accordingly think the way to formalise a function/loop.
+      
+     🗸 3. Assign it a meaningful complete name.
       
       **4. Integrate that into the main loop.**
 
