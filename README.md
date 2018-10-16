@@ -1,7 +1,7 @@
 # CIS surveys
 
-Survey data transformation on electoral behaviour.
-This project is aimed at transforming and harmonising surveys from the Spanish Centre of Sociological Research (Centro de Investigaciones Sociológicas, CIS).
+Survey data transformation.
+This project is aimed at transforming and harmonising surveys from the Spanish Centre of Sociological Research (Centro de Investigaciones Sociológicas, CIS). The surveys are part of the electoral studies carried out by the CIS with focus on regional and state level (*Parlamentos de Comunidades Autónomas* or *Congreso de los Diputados*).
 
 Data was downloaded from the official website www.cis.es and stored locally, according to their data policy.
 
