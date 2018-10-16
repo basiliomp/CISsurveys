@@ -1,26 +1,8 @@
-
-# Code for main loop --------------
-
 ### Creating a complete voting behaviour variable combining two columns from each
 # For this project usage only!
 # This is not a general application function, and will not work out of the CISsurvey project.
-if (!is.na(general[[x,"Otro.reciente"]])) {
-  # Assign relevant variable into a dictinctly named new variable # Voto.reciente
-  CIS$Voto.reciente <- subset(CIS, select = general[[x, "Voto.reciente"]])
-  CIS$Voto.reciente <- as_vector(CIS$Voto.reciente)
-  
-  # Assign relevant variable into a dictinctly named new variable # Otro.reciente
-  CIS$Otro.reciente <- subset(CIS, select = general[[x, "Otro.reciente"]])
-  CIS$Otro.reciente <- as_vector(CIS$Otro.reciente)
-  
-  #Apply the tailored function in order to get a complete voting behaviour variable
-  CIS <- recuerdovoto_completo(df = CIS)
-}
 
-
-# Function ------------------------
-
-recuerdovoto_completo <- function(df) {  #recuerdovoto_completo(CIS)
+voterecall <- function(df) {  #voterecall(CIS)
   
   RECUERDO <- factor(x = 0, levels = c(levels(df$Voto.reciente), 
                                            levels(df$Otro.reciente)[1:length(levels(df$Otro.reciente))-1],

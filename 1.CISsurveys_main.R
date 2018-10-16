@@ -4,6 +4,7 @@
 
 # Loading packages required
 library(tidyverse)
+library(lubridate)
 library(labelled)
 library(foreign)
 library(haven)
@@ -22,7 +23,8 @@ general <- readxl::read_xlsx("progreso trabajo.xlsx", sheet = "tabla", skip = 1,
 general <- filter(general, (!is.na(general$Token)))
 
 # Loop ----------------------------------------------------------------
-
+looplist <- list()
+starttime <- now() #at the end now() - starttime
 for (x in 1:nrow(general)) { 
   
   # Setting working directory for current survey file
@@ -49,12 +51,24 @@ for (x in 1:nrow(general)) {
     CIS$Otro.reciente <- subset(CIS, select = general[[x, "Otro.reciente"]])
     CIS$Otro.reciente <- as_vector(CIS$Otro.reciente)
     
-    #Apply the tailored function in order to get a complete voting behaviour variable
-    CIS <- recuerdovoto_completo(df = CIS)
+    #Placeholder for the vote recall variable (THIS SHOULD USE THE VOTEVARNAME FUNCTION)
+    CIS$RECUERDO <- factor(x = 0, levels = unique(c(levels(CIS$Voto.reciente), 
+                                                    levels(CIS$Otro.reciente),
+                                                    "Abstencion", "N.C. participacion")))
+    
+    # Apply the tailored function in order to get a complete voting behaviour variable
+    CIS <- voterecall(df = CIS)
+    
+    # Rename new variable to include data from year, time of survey and type of variable with votevarname()
+    names(CIS)[which(names(CIS) == "RECUERDO")] <- as.character(votevarname(x))
     
     } else if (!is.na(general[[x,"Voto.reciente"]]) & general[[x,"Voto.reciente"]] != "-") {
        CIS$RECUERDO <- CIS[[general[[x,"Voto.reciente"]]]]
-       }  else {
+       
+       # Rename new variable to include data from year, time of survey and type of variable with votevarname()
+       names(CIS)[which(names(CIS) == "RECUERDO")] <- as.character(votevarname(x))
+       
+       } else {
     general[x, "Looperror"] <- print(paste("Lack of VOTO RECIENTE in", general$Token[[x]]))
   }
   
@@ -96,61 +110,61 @@ for (x in 1:nrow(general)) {
   # ORIGEN (para encuestas en Catalunya) agregada manualmente CIS$ORIGENAGR
   
   
-  # Writing tables into Excel --------------------------------------------
-  
-  # Table header function for voting behaviour tables
-  write.table.header <- function(x, file, header){
-    cat(header, '\n',  file = file)
-    write.table(x = x, file = file, col.names = NA, sep = ";", dec = ",", append = T, row.names = T, na = "")
-  }
-  
-  # Tabulation Loop
-  if (general[x,"Encuesta"] != "post") {
-    print("TABLES NOT AVAILABLE")
-  } else {
-    # TABLAS COMPARATIVAS CON ELECCIONES AUTONOMICAS
-    # Aqui difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
-    if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) & general[x,"Encuesta"] == "post") {
-      # Declare data to be survey data and weight it accordingly (if needed)
-      CISweight <- svydesign(ids =  ~1, strata = ~CIS[,general[[x,"Estrato"]]],
-                             weights = ~CIS[,general[[x,"Ponderacion"]]], data = CIS)
-      tab.auto <- svytable(~RECUERDO+RVOTOAUT, design = CISweight)
-    } else if (general[x,"Encuesta"] == "pre") {
-      print("TABLES NOT AVAILABLE")
-    } else {
-      # Guardamos como una tabla el elemento que llamaremos desde las distintas tabulaciones a realizar
-      tab.auto <- table(CIS$RECUERDO, CIS$RVOTOAUT)
-    }
-  }
-  
-  
-  if (general[x,"Encuesta"] == "pre") {
-    print("TABLES NOT AVAILABLE")
-  } else {
-    autonotab(tab.auto)
-  }
-  
-  
-  # TABLAS COMPARATIVAS CON ELECCIONES GENERALES
-  # Aqui difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
-  if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) & general[x,"Encuesta"] == "post") {
-    # Declare data to be survey data and weight it accordingly (if needed)
-    CISweight <- svydesign(ids =  ~1, strata = ~CIS[,general[[x,"Estrato"]]],
-                           weights = ~CIS[,general[[x,"Ponderacion"]]], data = CIS)
-    tab.gen <- svytable(~RECUERDO+RVOTOGEN, design = CISweight)
-  } else if (general[x,"Encuesta"] == "pre" & general[x,"Voto.generales"] != "") {
-    print("TABLES NOT AVAILABLE")
-  } else {
-    # Guardamos como una tabla el elemento que llamaremos desde las distintas tabulaciones a realizar
-    tab.gen <- table(CIS$RECUERDO, CIS$RVOTOGEN)
-  }
-  
-  if (general[x,"Encuesta"] == "pre") {
-    print("TABLES NOT AVAILABLE")
-  } else {
-    generaltab(tab.gen)
-  }
-  
+  # # Writing tables into Excel --------------------------------------------
+  # 
+  # # Table header function for voting behaviour tables
+  # write.table.header <- function(x, file, header){
+  #   cat(header, '\n',  file = file)
+  #   write.table(x = x, file = file, col.names = NA, sep = ";", dec = ",", append = T, row.names = T, na = "")
+  # }
+  # 
+  # # Tabulation Loop
+  # if (general[x,"Encuesta"] != "post") {
+  #   print("TABLES NOT AVAILABLE")
+  # } else {
+  #   # TABLAS COMPARATIVAS CON ELECCIONES AUTONOMICAS
+  #   # Aqui difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
+  #   if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) & general[x,"Encuesta"] == "post") {
+  #     # Declare data to be survey data and weight it accordingly (if needed)
+  #     CISweight <- svydesign(ids =  ~1, strata = ~CIS[,general[[x,"Estrato"]]],
+  #                            weights = ~CIS[,general[[x,"Ponderacion"]]], data = CIS)
+  #     tab.auto <- svytable(~RECUERDO+RVOTOAUT, design = CISweight)
+  #   } else if (general[x,"Encuesta"] == "pre") {
+  #     print("TABLES NOT AVAILABLE")
+  #   } else {
+  #     # Guardamos como una tabla el elemento que llamaremos desde las distintas tabulaciones a realizar
+  #     tab.auto <- table(CIS$RECUERDO, CIS$RVOTOAUT)
+  #   }
+  # }
+  # 
+  # 
+  # if (general[x,"Encuesta"] == "pre") {
+  #   print("TABLES NOT AVAILABLE")
+  # } else {
+  #   autonotab(tab.auto)
+  # }
+  # 
+  # 
+  # # TABLAS COMPARATIVAS CON ELECCIONES GENERALES
+  # # Aqui difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
+  # if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) & general[x,"Encuesta"] == "post") {
+  #   # Declare data to be survey data and weight it accordingly (if needed)
+  #   CISweight <- svydesign(ids =  ~1, strata = ~CIS[,general[[x,"Estrato"]]],
+  #                          weights = ~CIS[,general[[x,"Ponderacion"]]], data = CIS)
+  #   tab.gen <- svytable(~RECUERDO+RVOTOGEN, design = CISweight)
+  # } else if (general[x,"Encuesta"] == "pre" & general[x,"Voto.generales"] != "") {
+  #   print("TABLES NOT AVAILABLE")
+  # } else {
+  #   # Guardamos como una tabla el elemento que llamaremos desde las distintas tabulaciones a realizar
+  #   tab.gen <- table(CIS$RECUERDO, CIS$RVOTOGEN)
+  # }
+  # 
+  # if (general[x,"Encuesta"] == "pre") {
+  #   print("TABLES NOT AVAILABLE")
+  # } else {
+  #   generaltab(tab.gen)
+  # }
+
   
   # Export to SPSS ------------------------------------------------------
   

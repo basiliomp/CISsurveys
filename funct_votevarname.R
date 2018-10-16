@@ -1,15 +1,9 @@
 #Function for creating explicit names to voting behaviour related variables
 
-# Problem to solve ----------------
-# ! Check what to do with these survey entries, because they are NAs!
-filter(general, is.na(Elecciones)) %>%
-  select(1:3)
-
-
 # Actual function -----------------
 #Extracting the year for each survey as simplified two characters version
 votevarname <- function (i) {
-  if (i %in% 1:nrow(general)) { #Security check
+  if (i %in% 1:nrow(general) && !is.na(general[[i,"Elecciones"]]) ) { #Security check
     #Naming of pre or post surveys, according to the variable of interest (voting intention/behaviour)
     if (general$Encuesta[[i]] == "pre") {
       preorpost <- "INTE"
@@ -30,3 +24,9 @@ votevarname <- function (i) {
     print("Invalid input. Use a row number from the reference database `general`")
   }
 }
+
+#  Work in progress. Code for assigning this new name to the corresponding variable.
+# rename.variable <- function (df, old, new) {
+#   names(df)[which(names(df) == old)] <- new
+#   df
+# }
