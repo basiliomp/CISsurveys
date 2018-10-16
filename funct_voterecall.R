@@ -49,7 +49,3 @@ recuerdovoto_completo <- function(df) {  #recuerdovoto_completo(CIS)
   
   return(df)
 }      
- 
-#test
-recuerdovoto_completo(CIS)
-

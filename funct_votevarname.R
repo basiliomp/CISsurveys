@@ -25,6 +25,7 @@ votevarname <- function (i) {
   #Combine all the pieces of information together
   nombrevar <- paste0(preorpost, elect_ambit, simpleyear,  "AGR")
   return(nombrevar)
+  
   } else { #Error path for those number inputs without a reference in 'general'
     print("Invalid input. Use a row number from the reference database `general`")
   }
