@@ -79,11 +79,18 @@ for (x in 1:nrow(general)) {
     general[x, "Looperror"] <- print(paste("Lack of VOTO PASADO in", general$Token[[x]]))
   }
   
-  # # RVOTOGEN para las elecciones generales del ciclo pasado (*no missing values*)
+  # RVOTOGEN para las elecciones generales del ciclo pasado (*no missing values*)
   if (!is.na(general[x,"Voto.generales"])) {
     CIS$RVGENAGR <- CIS[[general[[x,"Voto.generales"]]]]
   } else {
     general[x, "Looperror"] <- print(paste("Lack of GENERALES in", general$Token[[x]]))
+  }
+  
+  # INTV para las elecciones generales del ciclo pasado (*no missing values*)
+  if (!is.na(general[x,"Intencion.voto"])) {
+    CIS$INTVAGR <- CIS[[general[[x,"Intencion.voto"]]]]
+  } else {
+    general[x, "Looperror"] <- print(paste("Lack of Intencion.voto in", general$Token[[x]]))
   }
   
   # ESTUDIOS (renombrar)
