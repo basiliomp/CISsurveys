@@ -37,7 +37,7 @@ Las variables solicitadas son:
 
 ☐ *Same for voting intention??* That would imply:
       
-     🗸 1. Check the question in each survey recording voting intention (manually from reading PDFs and into 'general' table)
+     ** 1. Check the question in each survey recording voting intention, not 'VOTOSIM' (manually from reading PDFs and into 'general' table) **
       
      🗸 2. Assess how homogeneus is the result, and accordingly think the way to formalise a function/loop.
       
