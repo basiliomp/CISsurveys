@@ -35,15 +35,7 @@ Las variables solicitadas son:
 
 ☑ Combine the variables 'Recuerdo.reciente' & 'Otro.recuerdo' in order to get a new variable capturing all the possible answers regarding interveews voting behaviour.
 
-☑ *Same for voting intention??* That would imply:
-      
-     ** 1. Check the question in each survey recording voting intention, not 'VOTOSIM' (manually from reading PDFs and into 'general' table) **
-      
-     🗸 2. Assess how homogeneus is the result, and accordingly think the way to formalise a function/loop.
-      
-     🗸 3. Assign it a meaningful complete name.
-      
-     🗸 4. Integrate that into the main loop.
+☑ Same for voting intention.
 
 ☑ Add to code a way to capture a 'year reference' for voting behaviour variables.
 
