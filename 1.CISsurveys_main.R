@@ -180,6 +180,6 @@ for (x in 1:nrow(general)) {
   # Contador de iteraciones con sello temporal
   if (x %% 50 == 0) { 
     print(paste0("Progress: ", x, " out of ", nrow(general), " iterations completed."))
-    print(paste0("---------------------", timestamp(), "---------------------"))
+    print(timestamp())
   }
 }
