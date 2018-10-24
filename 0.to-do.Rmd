@@ -35,7 +35,7 @@ Las variables solicitadas son:
 
 ☑ Combine the variables 'Recuerdo.reciente' & 'Otro.recuerdo' in order to get a new variable capturing all the possible answers regarding interveews voting behaviour.
 
-☐ *Same for voting intention??* That would imply:
+☑ *Same for voting intention??* That would imply:
       
      ** 1. Check the question in each survey recording voting intention, not 'VOTOSIM' (manually from reading PDFs and into 'general' table) **
       
@@ -43,9 +43,11 @@ Las variables solicitadas son:
       
      🗸 3. Assign it a meaningful complete name.
       
-      **4. Integrate that into the main loop.**
+     🗸 4. Integrate that into the main loop.
 
 ☑ Add to code a way to capture a 'year reference' for voting behaviour variables.
+
+☐ Add code to generate a table using voting intention variable in pre-election surveys.
 
 ☐ Check the tables created by the code and how they look in MS Excel.
     ☐ If possible, consider the pros and cons of using the package "WriteXLS" in this process. 
