@@ -10,12 +10,12 @@
   
 # Consider adding a second argument to the function below so `x` is specified explicitly?
 
-#Function for tabulating answers from reported vot on general elections
+#Function for tabulating answers from reported vote on general elections
 generaltab <- function(tab_gen) { 
   #Tabla de transferencias desde pasadas generales absolutas
   write.table.header(x = tab.gen, file = paste(general[x,"Token"], "GEN_abs.csv", sep = "_"), 
-                     header = "Voto reciente (filas) y en pasadas elecciones generales (columnas) en n煤mero absolutos")
-  
+                     header = "Voto reciente (filas) y en pasadas elecciones generales (columnas) en n鷐ero absolutos")
+  s
   #*  #Tabla de transferencias porcentuales desde pasadas generales por fila
   write.table.header(x = round(prop.table(tab.gen, margin = 1), digits = 4)*100, #margin=1 es para % por fila
                      file = paste(general[x,"Token"], "GEN_perc_fila.csv", sep = "_"), 
@@ -29,19 +29,36 @@ generaltab <- function(tab_gen) {
 
 
 
-#Function for tabulating answers from reported vot on regional elections
+#Function for tabulating answers from reported vote on regional elections
 autonotab <- function(tab_auto) { 
-  #Tabla de transferencias desde pasadas auton贸micas en t茅rminos absolutos
+  #Tabla de transferencias desde pasadas auton髆icas en terminos absolutos
   write.table.header(x = tab.auto, file = paste(general[x,"Token"], "AUTO_abs.csv", sep = "_"), 
-                     header = "Voto reciente (filas) y en pasadas elecciones auton贸micas (columnas) en n煤mero absolutos")
+                     header = "Voto reciente (filas) y en pasadas elecciones auton髆icas (columnas) en n鷐eros absolutos")
   
-  #* #Tabla de transferencias porcentuales desde pasadas auton贸micas por fila
+  #* #Tabla de transferencias porcentuales desde pasadas auton髆icas por fila
   write.table.header(x = round(prop.table(tab.auto, margin = 1), digits = 4)*100, #margin=1 es para % por fila
                      file = paste(general[x,"Token"], "AUTO_perc_fila.csv", sep = "_"), 
-                     header = "Voto reciente (filas) y en pasadas elecciones auton贸micas (columnas) en % por fila")
+                     header = "Voto reciente (filas) y en pasadas elecciones auton髆icas (columnas) en % por fila")
   
-  #*  #Tabla de transferencias porcentuales desde pasadas auton贸micas por columna
+  #*  #Tabla de transferencias porcentuales desde pasadas auton髆icas por columna
   write.table.header(x = round(prop.table(tab.auto, margin = 2), digits = 4)*100, #margin=2 es para % por columna
                      file = paste(general[x,"Token"], "AUTO_perc_colu.csv", sep = "_"), 
-                     header = "Voto reciente (filas) y en pasadas elecciones auton贸micas (columnas) en % por columnas")
+                     header = "Voto reciente (filas) y en pasadas elecciones auton髆icas (columnas) en % por columnas")
+}
+
+#Function for tabulating answers from voting intention from pre election surveys
+intentab <- function(tab_inten) { 
+  #Tabla de transferencias desde pasadas auton髆icas en t閞minos absolutos
+  write.table.header(x = tab.inten, file = paste(general[x,"Token"], "INTEN_abs.csv", sep = "_"), 
+                     header = "Intenci髇 de voto (filas) y en pasadas elecciones auton髆icas (columnas) en n鷐eros absolutos")
+  
+  #* #Tabla de transferencias porcentuales desde pasadas micas por fila
+  write.table.header(x = round(prop.table(tab.inten, margin = 1), digits = 4)*100, #margin=1 es para % por fila
+                     file = paste(general[x,"Token"], "INTEN_perc_fila.csv", sep = "_"), 
+                     header = "Intenc髇 de voto (filas) y en pasadas elecciones auton髆icas (columnas) en % por fila")
+  
+  #*  #Tabla de transferencias porcentuales desde pasadas intenn髆icas por columna
+  write.table.header(x = round(prop.table(tab.inten, margin = 2), digits = 4)*100, #margin=2 es para % por columna
+                     file = paste(general[x,"Token"], "INTEN_perc_colu.csv", sep = "_"), 
+                     header = "Intenci髇 de voto (filas) y en pasadas elecciones auton髆icas (columnas) en % por columnas")
 }
