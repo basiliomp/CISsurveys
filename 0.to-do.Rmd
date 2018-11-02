@@ -46,4 +46,8 @@ Las variables solicitadas son:
 
 ☐ Check weights in relative frequency tables.
 
-☐ Check the file structure (remove any "\.Rhistory$" file within the files).
+☑ Check the file structure and remove any "\.Rhistory$" file. These code should do the trick:
+    ``` {r}
+    list.files(path = ".", pattern = "\\.Rhistory$", recursive = T, all.files = T) %>%
+    file.remove()
+    ```
