@@ -15,7 +15,7 @@ generaltab <- function(tab_gen) {
   #Tabla de transferencias desde pasadas generales absolutas
   write.table.header(x = tab.gen, file = paste(general[x,"Token"], "GEN_abs.csv", sep = "_"), 
                      header = "Voto reciente (filas) y en pasadas elecciones generales (columnas) en número absolutos")
-  s
+  
   #*  #Tabla de transferencias porcentuales desde pasadas generales por fila
   write.table.header(x = round(prop.table(tab.gen, margin = 1), digits = 4)*100, #margin=1 es para % por fila
                      file = paste(general[x,"Token"], "GEN_perc_fila.csv", sep = "_"), 
@@ -26,8 +26,6 @@ generaltab <- function(tab_gen) {
                      file = paste(general[x,"Token"], "GEN_perc_colu.csv", sep = "_"), 
                      header = "Voto reciente (filas) y en pasadas elecciones generales (columnas) en % por columna")
 }
-
-
 
 #Function for tabulating answers from reported vote on regional elections
 autonotab <- function(tab_auto) { 
