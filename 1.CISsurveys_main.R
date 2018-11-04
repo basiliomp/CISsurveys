@@ -72,14 +72,14 @@ for (x in 1:nrow(general)) {
     general[x, "Looperror"] <- print(paste("Lack of VOTO RECIENTE in", general$Token[[x]]))
   }
   
-  # RVOTOAUT para las elecciones autonomicas del ciclo pasado (*no missing values*)
+  # RVAUTAGR para las elecciones autonomicas del ciclo pasado (*no missing values*)
   if (!is.na(general[x,"Voto.pasado"])) {
     CIS$RVAUTAGR <- CIS[[general[[x,"Voto.pasado"]]]]
   } else {
     general[x, "Looperror"] <- print(paste("Lack of VOTO PASADO in", general$Token[[x]]))
   }
   
-  # RVOTOGEN para las elecciones generales del ciclo pasado (*no missing values*)
+  # RVGENAGR para las elecciones generales del ciclo pasado (*no missing values*)
   if (!is.na(general[x,"Voto.generales"])) {
     CIS$RVGENAGR <- CIS[[general[[x,"Voto.generales"]]]]
   } else {
@@ -117,59 +117,90 @@ for (x in 1:nrow(general)) {
   # ORIGEN (para encuestas en Catalunya) agregada manualmente CIS$ORIGENAGR
   
   
-  # # Writing tables into Excel --------------------------------------------
+  # Writing tables into Excel --------------------------------------------
    
   # Table header function for voting behaviour tables
-  write.table.header <- function(x, file, header){
+  write_tab_header <- function(x, file, header){
     cat(header, '\n',  file = file)
     write.table(x = x, file = file, col.names = NA, sep = ";", dec = ",", append = T, row.names = T, na = "")
   }
   
-  # Tabulation Loop
-  if (general[x,"Encuesta"] != "post") {
-    print("TABLES NOT AVAILABLE")
-  } else {
-    # TABLAS COMPARATIVAS CON ELECCIONES AUTONOMICAS
-    # Aqui difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
-    if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) & general[x,"Encuesta"] == "post") {
+  ### Tabulation Loop
+
+  ### REGIONAL ELECTION VOTING TABLES  
+  
+  if (general[x,"Encuesta"] == "post") {
+
+    # Different code required for weighted and not weighted surveys.
+    if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"])) {
       # Declare data to be survey data and weight it accordingly (if needed)
       CISweight <- svydesign(ids =  ~1, strata = ~CIS[,general[[x,"Estrato"]]],
                              weights = ~CIS[,general[[x,"Ponderacion"]]], data = CIS)
-      tab.auto <- svytable(~RECUERDO+RVOTOAUT, design = CISweight)
-    } else if (general[x,"Encuesta"] == "pre") {
-      print("TABLES NOT AVAILABLE")
+      
+      tab_auto <- svytable(~RECUERDO + RVAUTAGR, design = CISweight)
+      tab_gen <- svytable(~RECUERDO + RVGENAGR, design = CISweight)
+      
+      # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
+      autonotab(tab_auto)
+      generaltab(tab_gen)
+    
+    } else if (!is.na(general[x,"Ponderacion"]) & is.na(general[x,"Estrato"])) {
+        
+        # Declare data to be survey data and weight it accordingly (if needed)
+        CISweight <- svydesign(ids =  ~1, strata = NULL, weights = ~CIS[,general[[x,"Ponderacion"]]], data = CIS)
+        
+        tab_auto <- svytable(~RECUERDO + RVAUTAGR, design = CISweight)
+        tab_gen <- svytable(~RECUERDO + RVGENAGR, design = CISweight)
+        
+        # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
+        autonotab(tab_auto)
+        generaltab(tab_gen)
+      
     } else {
-      # Guardamos como una tabla el elemento que llamaremos desde las distintas tabulaciones a realizar
-      tab.auto <- table(CIS$RECUERDO, CIS$RVOTOAUT)
+      
+      # Save as table the data tabulation in order to call it later for display and export.
+      tab_auto <- table(CIS$RECUERDO, CIS$RVAUTAGR)
+      tab_gen <- table(CIS$RECUERDO, CIS$RVGENAGR)
+      
+      # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
+      autonotab(tab_auto)
+      generaltab(tab_gen)
     }
   }
+
+  ### VOTING INTENTION TABLES
   
-  
-  if (general[x,"Encuesta"] == "pre") {
-    print("TABLES NOT AVAILABLE")
-  } else {
-    autonotab(tab.auto)
-  }
-  
-  
-  # TABLAS COMPARATIVAS CON ELECCIONES GENERALES
-  # Aqui difiere el tratamiento de las encuestas con ponderaciones y las que no tienen.
-  if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) & general[x,"Encuesta"] == "post") {
-    # Declare data to be survey data and weight it accordingly (if needed)
-    CISweight <- svydesign(ids =  ~1, strata = ~CIS[,general[[x,"Estrato"]]],
-                           weights = ~CIS[,general[[x,"Ponderacion"]]], data = CIS)
-    tab.gen <- svytable(~RECUERDO+RVOTOGEN, design = CISweight)
-  } else if (general[x,"Encuesta"] == "pre" & general[x,"Voto.generales"] != "") {
-    print("TABLES NOT AVAILABLE")
-  } else {
-    # Guardamos como una tabla el elemento que llamaremos desde las distintas tabulaciones a realizar
-    tab.gen <- table(CIS$RECUERDO, CIS$RVOTOGEN)
-  }
-  ### Add condition on 'general$Intencion.voto'
-  if (general[x,"Encuesta"] == "pre") {
-    print("TABLES NOT AVAILABLE")
-  } else {
-    generaltab(tab.gen)
+  if (general[x,"Encuesta"] == "pre" & !is.na(general[x,"Intencion.voto"])) {
+    
+    if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) )  {
+      
+      # Declare data to be survey data and weight it accordingly (if needed)
+      CISweight <- svydesign(ids =  ~1, strata = ~CIS[,general[[x,"Estrato"]]],
+                             weights = ~CIS[,general[[x,"Ponderacion"]]], data = CIS)
+      
+      tab_inten <- svytable(~RECUERDO + INTVAGR, design = CISweight)
+      
+      # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
+      intentab(tab_inten)
+      
+    } else if (!is.na(general[x,"Ponderacion"]) & is.na(general[x,"Estrato"])) {
+      
+      # Declare data to be survey data and weight it accordingly (if needed)
+      CISweight <- svydesign(ids =  ~1, strata = NULL, weights = ~CIS[,general[[x,"Ponderacion"]]], data = CIS)
+      
+      tab_inten <- svytable(~RECUERDO + INTVAGR, design = CISweight)
+      
+      # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
+      intentab(tab_inten)
+      
+    } else {
+      
+      # Save as table the data tabulation in order to call it later for display and export.
+      tab_inten <- table(CIS$RECUERDO, CIS$INTVAGR)
+      
+      # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
+      intentab(tab_inten)
+    }
   }
  
   # Export to SPSS ------------------------------------------------------
