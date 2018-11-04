@@ -35,7 +35,7 @@ general <- readxl::read_xlsx("progreso trabajo.xlsx", sheet = "tabla", skip = 1,
 general <- filter(general, (!is.na(general$Token)))
 
 # Loop ----------------------------------------------------------------
-looplist <- list()
+
 starttime <- now() #at the end now() - starttime
 for (x in 1:nrow(general)) { 
   
@@ -140,8 +140,8 @@ for (x in 1:nrow(general)) {
     # Different code required for weighted and not weighted surveys.
     if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"])) {
       # Declare data to be survey data and weight it accordingly (if needed)
-      CISweight <- svydesign(ids =  ~1, strata = ~CIS[,general[[x,"Estrato"]]],
-                             weights = ~CIS[,general[[x,"Ponderacion"]]], data = CIS)
+      CISweight <- svydesign(ids = ~1, strata = CIS[,general[[x,"Estrato"]]],
+                             weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
       
       tab_auto <- svytable(~RECUERDO + RVAUTAGR, design = CISweight)
       tab_gen <- svytable(~RECUERDO + RVGENAGR, design = CISweight)
@@ -153,7 +153,8 @@ for (x in 1:nrow(general)) {
     } else if (!is.na(general[x,"Ponderacion"]) & is.na(general[x,"Estrato"])) {
         
         # Declare data to be survey data and weight it accordingly (if needed)
-        CISweight <- svydesign(ids =  ~1, strata = NULL, weights = ~CIS[,general[[x,"Ponderacion"]]], data = CIS)
+        CISweight <- svydesign(ids = ~1, strata = NULL, 
+                               weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
         
         tab_auto <- svytable(~RECUERDO + RVAUTAGR, design = CISweight)
         tab_gen <- svytable(~RECUERDO + RVGENAGR, design = CISweight)
@@ -174,17 +175,17 @@ for (x in 1:nrow(general)) {
     }
   }
 
-  ### VOTING INTENTION TABLES
+  ### VOTING INTENTION TABLES (compared to vote recall from past election, usually 4 years ago)
   
-  if (general[x,"Encuesta"] == "pre" & !is.na(general[x,"Intencion.voto"])) {
+  if (general[x,"Encuesta"] == "pre" & !is.na(general[x,"Intencion.voto"]) & !is.na(general[x,"Voto.pasado"])) {
     
     if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) )  {
       
       # Declare data to be survey data and weight it accordingly (if needed)
-      CISweight <- svydesign(ids =  ~1, strata = ~CIS[,general[[x,"Estrato"]]],
-                             weights = ~CIS[,general[[x,"Ponderacion"]]], data = CIS)
+      CISweight <- svydesign(ids = ~1, strata = ~CIS[,general[[x,"Estrato"]]],
+                             weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
       
-      tab_inten <- svytable(~RECUERDO + INTVAGR, design = CISweight)
+      tab_inten <- svytable(~RVAUTAGR + INTVAGR, design = CISweight)
       
       # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
       intentab(tab_inten)
@@ -192,9 +193,10 @@ for (x in 1:nrow(general)) {
     } else if (!is.na(general[x,"Ponderacion"]) & is.na(general[x,"Estrato"])) {
       
       # Declare data to be survey data and weight it accordingly (if needed)
-      CISweight <- svydesign(ids =  ~1, strata = NULL, weights = ~CIS[,general[[x,"Ponderacion"]]], data = CIS)
+      CISweight <- svydesign(ids = ~1, strata = NULL, 
+                             weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
       
-      tab_inten <- svytable(~RECUERDO + INTVAGR, design = CISweight)
+      tab_inten <- svytable(~RVAUTAGR + INTVAGR, design = CISweight)
       
       # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
       intentab(tab_inten)
@@ -202,7 +204,7 @@ for (x in 1:nrow(general)) {
     } else {
       
       # Save as table the data tabulation in order to call it later for display and export.
-      tab_inten <- table(CIS$RECUERDO, CIS$INTVAGR)
+      tab_inten <- table(CIS$RVAUTAGR, CIS$INTVAGR)
       
       # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
       intentab(tab_inten)
