@@ -17,6 +17,18 @@ library(WriteXLS)
 project_root <- "D:/Dropbox/AI_ELEC_AUT/Encuestas"
 setwd(project_root)
 
+# Running code for functions thata are specific for this project
+requiredfunctions <- list("agegroup",
+                          "write_tab_header",
+                          "autonotab",
+                          "generaltab",
+                          "intentab",
+                          "voterecall",
+                          "votevarname")
+
+# Security check: Are all required functions loaded into the working space?
+sum(map_lgl(requiredfunctions, exists)) == length(requiredfunctions)
+
 # Reading index database into R
 general <- readxl::read_xlsx("progreso trabajo.xlsx", sheet = "tabla", skip = 1, col_names = T )
 # Special case surveys are pulled out of the main analysis
@@ -118,12 +130,6 @@ for (x in 1:nrow(general)) {
   
   
   # Writing tables into Excel --------------------------------------------
-   
-  # Table header function for voting behaviour tables
-  write_tab_header <- function(x, file, header){
-    cat(header, '\n',  file = file)
-    write.table(x = x, file = file, col.names = NA, sep = ";", dec = ",", append = T, row.names = T, na = "")
-  }
   
   ### Tabulation Loop
 
