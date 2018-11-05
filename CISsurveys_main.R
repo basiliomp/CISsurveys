@@ -72,13 +72,17 @@ for (x in 1:nrow(general)) {
     CIS <- voterecall(df = CIS)
     
     # Rename new variable to include data from year, time of survey and type of variable with votevarname()
-    names(CIS)[which(names(CIS) == "RECUERDO")] <- as.character(votevarname(x))
+    # The "RECUERDO" variable is kept for later usage in tabulation.
+    CIS <- cbind(CIS, CIS$RECUERDO)
+    names(CIS)[which(names(CIS) == "CIS$RECUERDO")] <- as.character(votevarname(x))
     
     } else if (!is.na(general[[x,"Voto.reciente"]]) & general[[x,"Voto.reciente"]] != "-") {
        CIS$RECUERDO <- CIS[[general[[x,"Voto.reciente"]]]]
        
        # Rename new variable to include data from year, time of survey and type of variable with votevarname()
-       names(CIS)[which(names(CIS) == "RECUERDO")] <- as.character(votevarname(x))
+       # The "RECUERDO" variable is kept for later usage in tabulation.
+       CIS <- cbind(CIS, CIS$RECUERDO)
+       names(CIS)[which(names(CIS) == "CIS$RECUERDO")] <- as.character(votevarname(x))
        
        } else {
     general[x, "Looperror"] <- print(paste("Lack of VOTO RECIENTE in", general$Token[[x]]))
@@ -135,49 +139,50 @@ for (x in 1:nrow(general)) {
 
   ### REGIONAL ELECTION VOTING TABLES  
   
-  if (general[x,"Encuesta"] == "post") {
+  if (general[x,"Encuesta"] == "post" & !is.null(CIS$RECUERDO)) {
 
     # Different code required for weighted and not weighted surveys.
     if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"])) {
       # Declare data to be survey data and weight it accordingly (if needed)
-      CISweight <- svydesign(ids = ~1, strata = CIS[,general[[x,"Estrato"]]],
-                             weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
-      
-      tab_auto <- svytable(~RECUERDO + RVAUTAGR, design = CISweight)
-      tab_gen <- svytable(~RECUERDO + RVGENAGR, design = CISweight)
+      #CISweight <- svydesign(ids = ~1, strata = CIS[,general[[x,"Estrato"]]],
+      #                       weights = CIS[,general[[x,"Ponderacion"]]], data = CIS) 
+      CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
       
       # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
-      autonotab(tab_auto)
-      generaltab(tab_gen)
-    
+      if (!is.null(CIS$RVAUTAGR)) {
+        autonotab(RECUERDO = CIS$RECUERDO, RVAUT = CIS$RVAUTAGR, weight = CISweight)
+      }
+      if (!is.null(CIS$RVGENAGR)) {
+        generaltab(RECUERDO = CIS$RECUERDO, RVGEN = CIS$RVGENAGR, weight = CISweight)
+      }
     } else if (!is.na(general[x,"Ponderacion"]) & is.na(general[x,"Estrato"])) {
         
         # Declare data to be survey data and weight it accordingly (if needed)
-        CISweight <- svydesign(ids = ~1, strata = NULL, 
-                               weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
-        
-        tab_auto <- svytable(~RECUERDO + RVAUTAGR, design = CISweight)
-        tab_gen <- svytable(~RECUERDO + RVGENAGR, design = CISweight)
+        CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
         
         # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
-        autonotab(tab_auto)
-        generaltab(tab_gen)
-      
+        if (!is.null(CIS$RVAUTAGR)) {
+          autonotab(RECUERDO = CIS$RECUERDO, RVAUT = CIS$RVAUTAGR, weight = CISweight)
+        }
+        if (!is.null(CIS$RVGENAGR)) {
+          generaltab(RECUERDO = CIS$RECUERDO, RVGEN = CIS$RVGENAGR, weight = CISweight)
+        }
     } else {
       
-      # Save as table the data tabulation in order to call it later for display and export.
-      tab_auto <- table(CIS$RECUERDO, CIS$RVAUTAGR)
-      tab_gen <- table(CIS$RECUERDO, CIS$RVGENAGR)
-      
       # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
-      autonotab(tab_auto)
-      generaltab(tab_gen)
+      if (!is.null(CIS$RVAUTAGR)) {
+        autonotab(RECUERDO = CIS$RECUERDO, RVAUTAGR = CIS$RVAUTAGR)
+      }
+      if (!is.null(CIS$RVGENAGR)) {
+        generaltab(RECUERDO = CIS$RECUERDO, RVGENAGR = CIS$RVGENAGR)
+      }
     }
   }
 
   ### VOTING INTENTION TABLES (compared to vote recall from past election, usually 4 years ago)
   
-  if (general[x,"Encuesta"] == "pre" & !is.na(general[x,"Intencion.voto"]) & !is.na(general[x,"Voto.pasado"])) {
+  if (general[x,"Encuesta"] == "pre" & !is.na(general[x,"Intencion.voto"]) &
+      !is.na(general[x,"Voto.pasado"]) & !is.null(CIS$RECUERDO)) {
     
     if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) )  {
       
@@ -185,10 +190,8 @@ for (x in 1:nrow(general)) {
       CISweight <- svydesign(ids = ~1, strata = ~CIS[,general[[x,"Estrato"]]],
                              weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
       
-      tab_inten <- svytable(~RVAUTAGR + INTVAGR, design = CISweight)
-      
       # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
-      intentab(tab_inten)
+      intentab(RECUERDO = CIS$RVAUTAGR, INTVAGR = CIS$INTVAGR, weight = CISweight)
       
     } else if (!is.na(general[x,"Ponderacion"]) & is.na(general[x,"Estrato"])) {
       
@@ -196,29 +199,31 @@ for (x in 1:nrow(general)) {
       CISweight <- svydesign(ids = ~1, strata = NULL, 
                              weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
       
-      tab_inten <- svytable(~RVAUTAGR + INTVAGR, design = CISweight)
-      
       # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
-      intentab(tab_inten)
+      intentab(RECUERDO = CIS$RVAUTAGR, INTVAGR = CIS$INTVAGR, weight = CISweight)
       
     } else {
       
-      # Save as table the data tabulation in order to call it later for display and export.
-      tab_inten <- table(CIS$RVAUTAGR, CIS$INTVAGR)
-      
       # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
-      intentab(tab_inten)
+      intentab(RECUERDO = CIS$RVAUTAGR, INTVAGR = CIS$INTVAGR)
     }
   }
  
   # Export to SPSS ------------------------------------------------------
   
-  #For EXPORTING the data it is better to use haven's function. Labelled data is read correctly by SPSS.
+  # Removing the variable RECUERDO from the data frame CIS. It is used as a token during the loop.
+  if ("RECUERDO" %in% names(CIS)) {
+    CIS$RECUERDO <- NULL
+  }
+  
+  # Better to use haven's function. Labelled data is read correctly by SPSS.
   write_sav(CIS, path = paste("nuevo", general[x,"Savfile"]))
   
-  # Contador de iteraciones con sello temporal
+# Loop tracking -------------------
+
   if (x %% 50 == 0) { 
     print(paste0("Progress: ", x, " out of ", nrow(general), " iterations completed."))
     print(timestamp())
   }
 }
+
