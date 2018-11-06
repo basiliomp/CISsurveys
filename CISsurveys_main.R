@@ -13,10 +13,6 @@ library(survey)
 library(WriteXLS)
 #library(Writexl) # Is it better?
 
-# Set your working directory
-project_root <- "D:/Dropbox/AI_ELEC_AUT/Encuestas"
-setwd(project_root)
-
 # Running code for functions thata are specific for this project
 requiredfunctions <- list("agegroup",
                           "write_tab_header",
@@ -28,6 +24,10 @@ requiredfunctions <- list("agegroup",
 
 # Security check: Are all required functions loaded into the working space?
 sum(map_lgl(requiredfunctions, exists)) == length(requiredfunctions)
+
+# Set your working directory
+project_root <- "D:/Dropbox/AI_ELEC_AUT/Encuestas"
+setwd(project_root)
 
 # Reading index database into R
 general <- readxl::read_xlsx("progreso trabajo.xlsx", sheet = "tabla", skip = 1, col_names = T )
@@ -146,8 +146,11 @@ for (x in 1:nrow(general)) {
       # Declare data to be survey data and weight it accordingly (if needed)
       #CISweight <- svydesign(ids = ~1, strata = CIS[,general[[x,"Estrato"]]],
       #                       weights = CIS[,general[[x,"Ponderacion"]]], data = CIS) 
-      CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
-      
+        if (is.factor(CIS[,general[[x,"Ponderacion"]]])) {
+        CISweight <- svydesign(ids = ~1, weights = as.numeric(as.character(CIS[,general[[x,"Ponderacion"]]])), data = CIS)
+      } else {
+        CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
+      }
       # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
       if (!is.null(CIS$RVAUTAGR)) {
         autonotab(RECUERDO = CIS$RECUERDO, RVAUT = CIS$RVAUTAGR, weight = CISweight)
@@ -181,7 +184,7 @@ for (x in 1:nrow(general)) {
 
   ### VOTING INTENTION TABLES (compared to vote recall from past election, usually 4 years ago)
   
-  if (general[x,"Encuesta"] == "pre" & !is.na(general[x,"Intencion.voto"]) & !is.na(general[x,"Voto.pasado"])) {
+  if (!is.na(general[x,"Intencion.voto"]) & !is.na(general[x,"Voto.pasado"])) {
     
     if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) )  {
       
