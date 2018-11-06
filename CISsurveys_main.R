@@ -181,8 +181,7 @@ for (x in 1:nrow(general)) {
 
   ### VOTING INTENTION TABLES (compared to vote recall from past election, usually 4 years ago)
   
-  if (general[x,"Encuesta"] == "pre" & !is.na(general[x,"Intencion.voto"]) &
-      !is.na(general[x,"Voto.pasado"]) & !is.null(CIS$RECUERDO)) {
+  if (general[x,"Encuesta"] == "pre" & !is.na(general[x,"Intencion.voto"]) & !is.na(general[x,"Voto.pasado"])) {
     
     if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) )  {
       
