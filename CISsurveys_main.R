@@ -193,7 +193,7 @@ for (x in 1:nrow(general)) {
                              weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
       
       # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
-      intentab(RECUERDO = CIS$RVAUTAGR, INTVAGR = CIS$INTVAGR, weight = CISweight)
+      intentab(RVAUTAGR = CIS$RVAUTAGR, INTVAGR = CIS$INTVAGR, weight = CISweight)
       
     } else if (!is.na(general[x,"Ponderacion"]) & is.na(general[x,"Estrato"])) {
       
@@ -202,12 +202,12 @@ for (x in 1:nrow(general)) {
                              weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
       
       # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
-      intentab(RECUERDO = CIS$RVAUTAGR, INTVAGR = CIS$INTVAGR, weight = CISweight)
+      intentab(RVAUTAGR = CIS$RVAUTAGR, INTVAGR = CIS$INTVAGR, weight = CISweight)
       
     } else {
       
       # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
-      intentab(RECUERDO = CIS$RVAUTAGR, INTVAGR = CIS$INTVAGR)
+      intentab(RVAUTAGR = CIS$RVAUTAGR, INTVAGR = CIS$INTVAGR)
     }
   }
  
