@@ -146,7 +146,12 @@ for (x in 1:nrow(general)) {
       # Declare data to be survey data and weight it accordingly (if needed)
       #CISweight <- svydesign(ids = ~1, strata = CIS[,general[[x,"Estrato"]]],
       #                       weights = CIS[,general[[x,"Ponderacion"]]], data = CIS) 
-        if (is.factor(CIS[,general[[x,"Ponderacion"]]])) {
+      
+      if (is.na(sum(CIS[,general[[x,"Ponderacion"]]]))) { #Check wether there are NAs in the weights vector.
+        CIS[is.na(CIS[,general[[x,"Ponderacion"]]]),general[[x,"Ponderacion"]]] <- 0 # Replace NAs with 0s
+      }
+      
+      if (is.factor(CIS[,general[[x,"Ponderacion"]]])) {
         CISweight <- svydesign(ids = ~1, weights = as.numeric(as.character(CIS[,general[[x,"Ponderacion"]]])), data = CIS)
       } else {
         CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
@@ -186,7 +191,13 @@ for (x in 1:nrow(general)) {
   
   if (!is.na(general[x,"Intencion.voto"]) & !is.na(general[x,"Voto.pasado"])) {
     
-    if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]) )  {
+    #Check wether there are NAs in the weights vector.
+    if (!is.na(general[x,"Ponderacion"])) {
+      if (is.na(sum(CIS[,general[[x,"Ponderacion"]]]))) {
+      CIS[is.na(CIS[,general[[x,"Ponderacion"]]]),general[[x,"Ponderacion"]]] <- 0 # Replace NAs with 0s
+      }
+    }
+    if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]))  {
       
       # Declare data to be survey data and weight it accordingly (if needed)
       CISweight <- svydesign(ids = ~1, strata = CIS[,general[[x,"Estrato"]]],
@@ -227,4 +238,3 @@ for (x in 1:nrow(general)) {
     print(timestamp())
   }
 }
-
