@@ -198,8 +198,7 @@ for (x in 1:nrow(general)) {
     } else if (!is.na(general[x,"Ponderacion"]) & is.na(general[x,"Estrato"])) {
       
       # Declare data to be survey data and weight it accordingly (if needed)
-      CISweight <- svydesign(ids = ~1, strata = NULL, 
-                             weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
+      CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
       
       # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
       intentab(RVAUTAGR = CIS$RVAUTAGR, INTVAGR = CIS$INTVAGR, weight = CISweight)
