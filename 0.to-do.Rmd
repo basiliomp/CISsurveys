@@ -46,7 +46,7 @@ Las variables solicitadas son:
 
 ☐ Check weights in relative frequency tables.
 
-☐ Clean and reorganise when needed the mess with AND / ESP surveys (2000, 2004 & 2008) in files and general table.
+☑ Clean and reorganise when needed the mess with AND / ESP surveys (2000, 2004 & 2008) in files and general table.
 
 ☑ Check the file structure and remove any "\.Rhistory$" file. These code should do the trick:
     ``` {r}
