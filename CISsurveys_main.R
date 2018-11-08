@@ -63,7 +63,7 @@ for (x in 1:nrow(general)) {
     CIS$Otro.reciente <- subset(CIS, select = general[[x, "Otro.reciente"]])
     CIS$Otro.reciente <- as_vector(CIS$Otro.reciente)
     
-    #Placeholder for the vote recall variable (THIS SHOULD USE THE VOTEVARNAME FUNCTION)
+    #Placeholder for the vote recall variable
     CIS$RECUERDO <- factor(x = 0, levels = unique(c(levels(CIS$Voto.reciente), 
                                                     levels(CIS$Otro.reciente),
                                                     "Abstencion", "N.C. participacion")))
@@ -91,6 +91,10 @@ for (x in 1:nrow(general)) {
   # RVAUTAGR para las elecciones autonomicas del ciclo pasado (*no missing values*)
   if (!is.na(general[x,"Voto.pasado"])) {
     CIS$RVAUTAGR <- CIS[[general[[x,"Voto.pasado"]]]]
+    
+    # Rename new variable to include data from year, time of survey and type of variable with votevarname()
+    #names(CIS)[which(names(CIS) == "CIS$RVAUTAGR")] <- as.character(votevarname(x, Eleccion = "AUT", Year = general[[x,"Year"]]-4))
+    
   } else {
     general[x, "Looperror"] <- print(paste("Lack of VOTO PASADO in", general$Token[[x]]))
   }
@@ -98,6 +102,10 @@ for (x in 1:nrow(general)) {
   # RVGENAGR para las elecciones generales del ciclo pasado (*no missing values*)
   if (!is.na(general[x,"Voto.generales"])) {
     CIS$RVGENAGR <- CIS[[general[[x,"Voto.generales"]]]]
+    
+    # Rename new variable to include data from year, time of survey and type of variable with votevarname()
+    #names(CIS)[which(names(CIS) == "CIS$RECUERDO")] <- as.character(votevarname(x, Eleccion = "GEN"))
+    
   } else {
     general[x, "Looperror"] <- print(paste("Lack of GENERALES in", general$Token[[x]]))
   }
@@ -142,20 +150,21 @@ for (x in 1:nrow(general)) {
   if (general[x,"Encuesta"] == "post" & !is.null(CIS$RECUERDO)) {
 
     # Different code required for weighted and not weighted surveys.
-    if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"])) {
+    if (!is.na(general[x,"Ponderacion"])) {
       # Declare data to be survey data and weight it accordingly (if needed)
       #CISweight <- svydesign(ids = ~1, strata = CIS[,general[[x,"Estrato"]]],
       #                       weights = CIS[,general[[x,"Ponderacion"]]], data = CIS) 
-      
-      if (is.na(sum(CIS[,general[[x,"Ponderacion"]]]))) { #Check wether there are NAs in the weights vector.
-        CIS[is.na(CIS[,general[[x,"Ponderacion"]]]),general[[x,"Ponderacion"]]] <- 0 # Replace NAs with 0s
-      }
       
       if (is.factor(CIS[,general[[x,"Ponderacion"]]])) {
         CISweight <- svydesign(ids = ~1, weights = as.numeric(as.character(CIS[,general[[x,"Ponderacion"]]])), data = CIS)
       } else {
         CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
       }
+      
+      if (anyNA(CIS[,general[[x,"Ponderacion"]]])) { #Check wether there are NAs in the weights vector.
+        CIS[is.na(CIS[,general[[x,"Ponderacion"]]]),general[[x,"Ponderacion"]]] <- 0 # Replace NAs with 0s
+      }
+      
       # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
       if (!is.null(CIS$RVAUTAGR)) {
         autonotab(RECUERDO = CIS$RECUERDO, RVAUT = CIS$RVAUTAGR, weight = CISweight)
@@ -163,18 +172,18 @@ for (x in 1:nrow(general)) {
       if (!is.null(CIS$RVGENAGR)) {
         generaltab(RECUERDO = CIS$RECUERDO, RVGEN = CIS$RVGENAGR, weight = CISweight)
       }
-    } else if (!is.na(general[x,"Ponderacion"]) & is.na(general[x,"Estrato"])) {
-        
-        # Declare data to be survey data and weight it accordingly (if needed)
-        CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
-        
-        # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
-        if (!is.null(CIS$RVAUTAGR)) {
-          autonotab(RECUERDO = CIS$RECUERDO, RVAUT = CIS$RVAUTAGR, weight = CISweight)
-        }
-        if (!is.null(CIS$RVGENAGR)) {
-          generaltab(RECUERDO = CIS$RECUERDO, RVGEN = CIS$RVGENAGR, weight = CISweight)
-        }
+    # } else if (!is.na(general[x,"Ponderacion"]) & is.na(general[x,"Estrato"])) {
+    #     
+    #     # Declare data to be survey data and weight it accordingly (if needed)
+    #     CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
+    #     
+    #     # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
+    #     if (!is.null(CIS$RVAUTAGR)) {
+    #       autonotab(RECUERDO = CIS$RECUERDO, RVAUT = CIS$RVAUTAGR, weight = CISweight)
+    #     }
+    #     if (!is.null(CIS$RVGENAGR)) {
+    #       generaltab(RECUERDO = CIS$RECUERDO, RVGEN = CIS$RVGENAGR, weight = CISweight)
+    #     }
     } else {
       
       # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
@@ -193,20 +202,11 @@ for (x in 1:nrow(general)) {
     
     #Check wether there are NAs in the weights vector.
     if (!is.na(general[x,"Ponderacion"])) {
-      if (is.na(sum(CIS[,general[[x,"Ponderacion"]]]))) {
+      if (anyNA(CIS[,general[[x,"Ponderacion"]]])) {
       CIS[is.na(CIS[,general[[x,"Ponderacion"]]]),general[[x,"Ponderacion"]]] <- 0 # Replace NAs with 0s
       }
     }
-    if (!is.na(general[x,"Ponderacion"]) & !is.na(general[x,"Estrato"]))  {
-      
-      # Declare data to be survey data and weight it accordingly (if needed)
-      CISweight <- svydesign(ids = ~1, strata = CIS[,general[[x,"Estrato"]]],
-                             weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
-      
-      # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
-      intentab(RVAUTAGR = CIS$RVAUTAGR, INTVAGR = CIS$INTVAGR, weight = CISweight)
-      
-    } else if (!is.na(general[x,"Ponderacion"]) & is.na(general[x,"Estrato"])) {
+    if (!is.na(general[x,"Ponderacion"]) ) {
       
       # Declare data to be survey data and weight it accordingly (if needed)
       CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
