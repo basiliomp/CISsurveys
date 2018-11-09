@@ -46,7 +46,7 @@ for (x in 1:nrow(general)) {
   # Reading survey data from SPSS into R with `foreign`. Alternatively: haven::read_spss(file = general[[x, "Savfile"]], user_na = TRUE)
   CIS <- foreign_to_labelled(read.spss(file = general[[x, "Savfile"]],
                                        to.data.frame = TRUE, 
-                                       reencode = 'utf-8',
+                                       reencode = 'ISO-8859-1', #This preserves Spanish special characters.
                                        use.value.labels = TRUE))
   
   # Variable transformation ---------------------------------------------
@@ -65,7 +65,7 @@ for (x in 1:nrow(general)) {
     #Placeholder for the vote recall variable
     CIS$RECUERDO <- factor(x = 0, levels = unique(c(levels(CIS$Voto.reciente), 
                                                     levels(CIS$Otro.reciente),
-                                                    "Abstencion", "N.C. participacion")))
+                                                    "Abstención", "N.C. participación")))
     
     # Apply the tailored function in order to get a complete voting behaviour variable
     CIS <- voterecall(df = CIS)
@@ -150,18 +150,29 @@ for (x in 1:nrow(general)) {
 
     # Different code required for weighted and not weighted surveys.
     if (!is.na(general[x,"Ponderacion"])) {
-      # Declare data to be survey data and weight it accordingly (if needed)
-      #CISweight <- svydesign(ids = ~1, strata = CIS[,general[[x,"Estrato"]]],
-      #                       weights = CIS[,general[[x,"Ponderacion"]]], data = CIS) 
       
+      # Security checks before defining weights
       if (is.factor(CIS[,general[[x,"Ponderacion"]]])) {
+          
         CISweight <- svydesign(ids = ~1, weights = as.numeric(as.character(CIS[,general[[x,"Ponderacion"]]])), data = CIS)
-      } else {
-        CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
-      }
-      
-      if (anyNA(CIS[,general[[x,"Ponderacion"]]])) { #Check wether there are NAs in the weights vector.
-        CIS[is.na(CIS[,general[[x,"Ponderacion"]]]),general[[x,"Ponderacion"]]] <- 0 # Replace NAs with 0s
+          
+          if (anyNA(CIS[,general[[x,"Ponderacion"]]])) { #Check wether there are NAs in the weights vector.
+            
+            CIS[is.na(CIS[,general[[x,"Ponderacion"]]]),general[[x,"Ponderacion"]]] <- 0 # Replace NAs with 0s
+            
+            # Weights specification for survey design definition
+            CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
+          }
+        
+        } else if (anyNA(CIS[,general[[x,"Ponderacion"]]])) { #Check wether there are NAs in the weights vector.
+        
+          CIS[is.na(CIS[,general[[x,"Ponderacion"]]]),general[[x,"Ponderacion"]]] <- 0 # Replace NAs with 0s
+          
+          # Weights specification for survey design definition
+          CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
+        
+          } else {
+          CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
       }
       
       # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
@@ -171,19 +182,7 @@ for (x in 1:nrow(general)) {
       if (!is.null(CIS$RVGENAGR)) {
         generaltab(RECUERDO = CIS$RECUERDO, RVGEN = CIS$RVGENAGR, weight = CISweight)
       }
-    # } else if (!is.na(general[x,"Ponderacion"]) & is.na(general[x,"Estrato"])) {
-    #     
-    #     # Declare data to be survey data and weight it accordingly (if needed)
-    #     CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
-    #     
-    #     # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
-    #     if (!is.null(CIS$RVAUTAGR)) {
-    #       autonotab(RECUERDO = CIS$RECUERDO, RVAUT = CIS$RVAUTAGR, weight = CISweight)
-    #     }
-    #     if (!is.null(CIS$RVGENAGR)) {
-    #       generaltab(RECUERDO = CIS$RECUERDO, RVGEN = CIS$RVGENAGR, weight = CISweight)
-    #     }
-    } else {
+  } else {
       
       # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
       if (!is.null(CIS$RVAUTAGR)) {

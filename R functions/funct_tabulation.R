@@ -2,7 +2,7 @@
 # New function for creating a meaningful title for voting recall tables
 write_tab_header <- function(x, file, header){
     cat(header, '\n',  file = file)
-    write.table(x= x, file = file, col.names = NA, sep = ";", dec = ",", append = T, row.names = T, na = "")
+    write.table(x = x, file = file, col.names = NA, sep = ";", dec = ",", append = T, row.names = T, na = "")
   }
   
 
@@ -19,9 +19,9 @@ generaltab <- function(RECUERDO, RVGENAGR, weight = NA) {
   } else {
     tab_gen <- table(RECUERDO, RVGENAGR)
   }
-  #Tabla de transferencias desde anteriores generales absolutas
+  # Tabla de transferencias desde anteriores generales en cifras absolutas
     write_tab_header(x = round((tab_gen)), file = paste(general[x,"Token"], "GEN_abs.csv", sep = "_"), 
-                    header = "Voto reciente (filas) y en anteriores elecciones generales (columnas) en n煤mero absolutos")
+                    header = "Voto reciente (filas) y en anteriores elecciones generales (columnas) en n鷐ero absolutos")
   
   # Tabla de transferencias porcentuales desde anteriores generales por fila
     write_tab_header(x = round(prop.table(tab_gen, margin = 1), digits = 4)*100, #margin=1 es para % por fila
@@ -47,19 +47,19 @@ autonotab <- function(RECUERDO, RVAUTAGR, weight = NA) {
     tab_auto <- table(RECUERDO, RVAUTAGR)
   }
   
-  # Tabla de transferencias desde anteriores auton贸micas en terminos absolutos
+  # Tabla de transferencias desde anteriores auton髆icas en cifras absolutas
   write_tab_header(x = round(tab_auto), file = paste(general[x,"Token"], "AUTO_abs.csv", sep = "_"), 
-                 header = "Voto reciente (filas) y en anteriores elecciones auton贸micas (columnas) en n煤meros absolutos")
+                 header = "Voto reciente (filas) y en anteriores elecciones auton髆icas (columnas) en n鷐eros absolutos")
   
-  # Tabla de transferencias porcentuales desde anteriores auton贸micas por fila
+  # Tabla de transferencias porcentuales desde anteriores auton髆icas por fila
   write_tab_header(x = round(prop.table(tab_auto, margin = 1), digits = 4)*100, #margin=1 es para % por fila
                    file = paste(general[x,"Token"], "AUTO_perc_fila.csv", sep = "_"), 
-                   header = "Voto reciente (filas) y en anteriores elecciones auton贸micas (columnas) en % por fila")
+                   header = "Voto reciente (filas) y en anteriores elecciones auton髆icas (columnas) en % por fila")
   
-  # Tabla de transferencias porcentuales desde anteriores auton贸micas por columna
+  # Tabla de transferencias porcentuales desde anteriores auton髆icas por columna
   write_tab_header(x = round(prop.table(tab_auto, margin = 2), digits = 4)*100, #margin=2 es para % por columna
                    file = paste(general[x,"Token"], "AUTO_perc_colu.csv", sep = "_"), 
-                   header = "Voto reciente (filas) y en anteriores elecciones auton贸micas (columnas) en % por columnas")
+                   header = "Voto reciente (filas) y en anteriores elecciones auton髆icas (columnas) en % por columnas")
 }
 
 
@@ -72,17 +72,17 @@ intentab <- function(RVAUTAGR, INTVAGR, weight = NA) {
   } else {
     tab_inten <- table(RVAUTAGR, INTVAGR)
   }
-  # Tabla de transferencias desde anteriores auton贸micas en t茅rminos absolutos
+  # Tabla de transferencias desde anteriores auton髆icas en cifras absolutas
   write_tab_header(x = round(tab_inten), file = paste(general[x,"Token"], "INTEN_abs.csv", sep = "_"), 
-                   header = "Intenci贸n de voto (filas) y recuerdo de voto anteriores elecciones auton贸micas (columnas) en n煤meros absolutos")
+                   header = "Intenci髇 de voto (filas) y recuerdo de voto anteriores elecciones auton髆icas (columnas) en n鷐eros absolutos")
   
   # Tabla de transferencias porcentuales desde anteriores micas por fila
   write_tab_header(x = round(prop.table(tab_inten, margin = 1), digits = 4)*100, #margin=1 es para % por fila
                    file = paste(general[x,"Token"], "INTEN_perc_fila.csv", sep = "_"), 
-                   header = "Intenc贸n de voto (filas) y recuerdo de voto en anteriores elecciones auton贸micas (columnas) en % por fila")
+                   header = "Intenc髇 de voto (filas) y recuerdo de voto en anteriores elecciones auton髆icas (columnas) en % por fila")
   
-  # Tabla de transferencias porcentuales desde anteriores intenn贸micas por columna
+  # Tabla de transferencias porcentuales desde anteriores intenn髆icas por columna
   write_tab_header(x = round(prop.table(tab_inten, margin = 2), digits = 4)*100, #margin=2 es para % por columna
                    file = paste(general[x,"Token"], "INTEN_perc_colu.csv", sep = "_"), 
-                   header = "Intenci贸n de voto (filas) y recuerdo de voto en anteriores elecciones auton贸micas (columnas) en % por columnas")
+                   header = "Intenci髇 de voto (filas) y recuerdo de voto en anteriores elecciones auton髆icas (columnas) en % por columnas")
 }
