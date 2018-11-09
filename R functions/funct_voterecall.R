@@ -5,7 +5,7 @@
 voterecall <- function(df) {  #voterecall(CIS)
   
   RECUERDO <- factor(x = 0, levels = c(levels(df$Voto.reciente), 
-                                           levels(df$Otro.reciente)[1:length(levels(df$Otro.reciente))-1],
+                                           levels(df$Otro.reciente)[1:length(levels(df$Otro.reciente)) - 1],
                                            "Abstencion", "N.C. participacion") )
   #The code works until here. Then :
   # Error in if (CIS[y, "Otro.reciente"][[1]] == "Fue a votar y vot.") { : 
