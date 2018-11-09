@@ -10,8 +10,7 @@ library(foreign)
 library(haven)
 library(readxl)
 library(survey)
-library(WriteXLS)
-#library(Writexl) # Is it better?
+library(WriteXLS) # Is it better? I think so since it allows for output format code (e.g. UTF-16) to be specified.
 
 # Running code for functions thata are specific for this project
 requiredfunctions <- list("agegroup",
