@@ -15,7 +15,7 @@ voterecall <- function(df) {  #voterecall(CIS)
       df[y, "RECUERDO"][[1]] <- NA
     } else if (df[y, "Otro.reciente"][[1]] == "Fue a votar y votó") {
       df[y, "RECUERDO"][[1]] <- (df[y, "Voto.reciente"][[1]])
-    } else if (df[y, "Otro.reciente"][[1]] == "Sí que voté") {  
+    } else if (df[y, "Otro.reciente"][[1]] == "Sí que voté" | df[y, "Otro.reciente"][[1]] == "Sí que votó") {  
       df[y, "RECUERDO"][[1]] <- (df[y, "Voto.reciente"][[1]])
     } else if (df[y, "Otro.reciente"] == "N.C.") {
       df[y, "RECUERDO"][[1]] <- "N.C. participación"
