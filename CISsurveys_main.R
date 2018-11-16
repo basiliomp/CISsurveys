@@ -92,7 +92,7 @@ for (x in 1:nrow(general)) {
     CIS$RVAUTAGR <- CIS[[general[[x,"Voto.pasado"]]]]
     
     # Rename new variable to include data from year, time of survey and type of variable with votevarname()
-    simplepastyear <- str_extract(string = as.character(general[[x, "Year]] - 4), pattern = "..$")
+    simplepastyear <- str_extract(string = as.character(general[[x, "Year"]] - 4), pattern = "..$")
     names(CIS)[which(names(CIS) == "CIS$RVAUTAGR")] <- paste0("RVAUT", simplepastyear, "AGR")
     
   } else {
@@ -104,14 +104,14 @@ for (x in 1:nrow(general)) {
     CIS$RVGENAGR <- CIS[[general[[x,"Voto.generales"]]]]
     
     # Rename new variable to include data from year, time of survey and type of variable with votevarname()
-    simplepastyear2 <- case_when(general[[x, "Year]] < 2000 ~ "96",
-                      general[[x, "Year]] > 2000 & general[[x, "Year]] < 2004 ~ "00",
-                      general[[x, "Year]] > 2004 & general[[x, "Year]] < 2008 ~ "04",
-                      general[[x, "Year]] > 2008 & general[[x, "Year]] < 2011 ~ "08",
-                      general[[x, "Year]] > 2011 & general[[x, "Year]] < 2015 ~ "11",
-                      general[[x, "Year]] > 2015 & general[[x, "Year]] < 2016 ~ "15",
-                      general[[x, "Year]] > 2016 & general[[x, "Year]] < 2018 ~ "16")
-    names(CIS)[which(names(CIS) == "CIS$RVGENAGR")] <- paste0("RVGEN", simplepastyear2, "AGR")
+    simplepastyear2 <- case_when(general[[x, "Year"]] < 2000 ~ "96",
+                      general[[x, "Year"]] > 2000 & general[[x, "Year"]] < 2004 ~ "00",
+                      general[[x, "Year"]] > 2004 & general[[x, "Year"]] < 2008 ~ "04",
+                      general[[x, "Year"]] > 2008 & general[[x, "Year"]] < 2011 ~ "08",
+                      general[[x, "Year"]] > 2011 & general[[x, "Year"]] < 2015 ~ "11",
+                      general[[x, "Year"]] > 2015 & general[[x, "Year"]] < 2016 ~ "15",
+                      general[[x, "Year"]] > 2016 & general[[x, "Year"]] < 2018 ~ "16")
+    names(CIS)[which(names(CIS) == "RVGENAGR")] <- paste0("RVGEN", simplepastyear2, "AGR")
     
   } else {
     general[x, "Looperror"] <- print(paste("Lack of GENERALES in", general$Token[[x]]))
