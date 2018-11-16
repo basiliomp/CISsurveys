@@ -1,4 +1,4 @@
-### Data manipulation from SPSS: Encuestas electorales autonómicas del CIS
+### Data manipulation from SPSS: Encuestas electorales autonÃ³micas del CIS
 
 # Set up --------------------------------------------------------------
 
@@ -65,7 +65,7 @@ for (x in 1:nrow(general)) {
     #Placeholder for the vote recall variable
     CIS$RECUERDO <- factor(x = 0, levels = unique(c(levels(CIS$Voto.reciente), 
                                                     levels(CIS$Otro.reciente),
-                                                    "Abstenci�n", "N.C. participaci�n")))
+                                                    "Abstención", "N.C. participación")))
     
     # Apply the tailored function in order to get a complete voting behaviour variable
     CIS <- voterecall(df = CIS)
@@ -92,7 +92,8 @@ for (x in 1:nrow(general)) {
     CIS$RVAUTAGR <- CIS[[general[[x,"Voto.pasado"]]]]
     
     # Rename new variable to include data from year, time of survey and type of variable with votevarname()
-    #names(CIS)[which(names(CIS) == "CIS$RVAUTAGR")] <- as.character(votevarname(x, Eleccion = "AUT", Year = general[[x,"Year"]]-4))
+    simplepastyear <- str_extract(string = as.character(general[[x, "Year]] - 4), pattern = "..$")
+    names(CIS)[which(names(CIS) == "CIS$RVAUTAGR")] <- paste0("RVAUT", simplepastyear, "AGR")
     
   } else {
     general[x, "Looperror"] <- print(paste("Lack of VOTO PASADO in", general$Token[[x]]))
@@ -103,7 +104,14 @@ for (x in 1:nrow(general)) {
     CIS$RVGENAGR <- CIS[[general[[x,"Voto.generales"]]]]
     
     # Rename new variable to include data from year, time of survey and type of variable with votevarname()
-    #names(CIS)[which(names(CIS) == "CIS$RECUERDO")] <- as.character(votevarname(x, Eleccion = "GEN"))
+    simplepastyear <- case_when(general[[x, "Year]] < 2000 ~ "96",
+                      general[[x, "Year]] > 2000 & general[[x, "Year]] < 2004 ~ "00",
+                      general[[x, "Year]] > 2004 & general[[x, "Year]] < 2008 ~ "04",
+                      general[[x, "Year]] > 2008 & general[[x, "Year]] < 2011 ~ "08",
+                      general[[x, "Year]] > 2011 & general[[x, "Year]] < 2015 ~ "11",
+                      general[[x, "Year]] > 2015 & general[[x, "Year]] < 2016 ~ "15",
+                      general[[x, "Year]] > 2016 & general[[x, "Year]] < 2018 ~ "16")
+    names(CIS)[which(names(CIS) == "CIS$RVGENAGR")] <- paste0("RVGEN", simplepastyear, "AGR")
     
   } else {
     general[x, "Looperror"] <- print(paste("Lack of GENERALES in", general$Token[[x]]))
