@@ -1,4 +1,4 @@
-### Data manipulation from SPSS: Encuestas electorales autonÃ³micas del CIS
+### Data manipulation from SPSS: Encuestas electorales auton�micas del CIS
 
 # Set up --------------------------------------------------------------
 
@@ -81,7 +81,7 @@ for (x in 1:nrow(general)) {
        # Rename new variable to include data from year, time of survey and type of variable with votevarname()
        # The "RECUERDO" variable is kept for later usage in tabulation.
        CIS <- cbind(CIS, CIS$RECUERDO)
-       names(CIS)[which(names(CIS) == "CIS$RECUERDO")] <- as.character(votevarname(x))
+       names(CIS)[which(names(CIS) == "RECUERDO")] <- as.character(votevarname(x))
        
        } else {
     general[x, "Looperror"] <- print(paste("Lack of VOTO RECIENTE in", general$Token[[x]]))
@@ -93,7 +93,7 @@ for (x in 1:nrow(general)) {
     
     # Rename new variable to include data from year, time of survey and type of variable with votevarname()
     simplepastyear <- str_extract(string = as.character(general[[x, "Year"]] - 4), pattern = "..$")
-    names(CIS)[which(names(CIS) == "CIS$RVAUTAGR")] <- paste0("RVAUT", simplepastyear, "AGR")
+    names(CIS)[which(names(CIS) == "RVAUTAGR")] <- paste0("RVAUT", simplepastyear, "AGR")
     
   } else {
     general[x, "Looperror"] <- print(paste("Lack of VOTO PASADO in", general$Token[[x]]))
@@ -104,22 +104,26 @@ for (x in 1:nrow(general)) {
     CIS$RVGENAGR <- CIS[[general[[x,"Voto.generales"]]]]
     
     # Rename new variable to include data from year, time of survey and type of variable with votevarname()
-    simplepastyear2 <- case_when(general[[x, "Year"]] < 2000 ~ "96",
-                      general[[x, "Year"]] > 2000 & general[[x, "Year"]] < 2004 ~ "00",
-                      general[[x, "Year"]] > 2004 & general[[x, "Year"]] < 2008 ~ "04",
-                      general[[x, "Year"]] > 2008 & general[[x, "Year"]] < 2011 ~ "08",
-                      general[[x, "Year"]] > 2011 & general[[x, "Year"]] < 2015 ~ "11",
-                      general[[x, "Year"]] > 2015 & general[[x, "Year"]] < 2016 ~ "15",
-                      general[[x, "Year"]] > 2016 & general[[x, "Year"]] < 2018 ~ "16")
+    simplepastyear2 <- case_when(general[[x, "Year"]] <= 2000 ~ "96",
+                      general[[x, "Year"]] > 2000 & general[[x, "Year"]] <= 2004 ~ "00",
+                      general[[x, "Year"]] > 2004 & general[[x, "Year"]] <= 2008 ~ "04",
+                      general[[x, "Year"]] > 2008 & general[[x, "Year"]] <= 2011 ~ "08",
+                      general[[x, "Year"]] > 2011 & general[[x, "Year"]] <= 2015 ~ "11",
+                      general[[x, "Year"]] > 2015 & general[[x, "Year"]] <= 2016 ~ "15",
+                      general[[x, "Year"]] > 2016 & general[[x, "Year"]] <= 2018 ~ "16")
     names(CIS)[which(names(CIS) == "RVGENAGR")] <- paste0("RVGEN", simplepastyear2, "AGR")
     
   } else {
     general[x, "Looperror"] <- print(paste("Lack of GENERALES in", general$Token[[x]]))
   }
   
-  # INTV para las elecciones generales del ciclo pasado (*no missing values*)
+  # INTV para las elecciones
   if (!is.na(general[x,"Intencion.voto"])) {
     CIS$INTVAGR <- CIS[[general[[x,"Intencion.voto"]]]]
+    
+    # Rename new variable to include data from year, time of survey and type of variable with votevarname()
+    simplepastyear <- str_extract(string = as.character(general[[x, "Year"]]), pattern = "..$")
+    names(CIS)[which(names(CIS) == "INTVAGR")] <- paste0("INTV", simplepastyear, "AGR")
   } else {
     general[x, "Looperror"] <- print(paste("Lack of Intencion.voto in", general$Token[[x]]))
   }
@@ -148,41 +152,41 @@ for (x in 1:nrow(general)) {
   # ORIGEN (para encuestas en Catalunya) agregada manualmente CIS$ORIGENAGR
   
   
-  # Writing tables into Excel --------------------------------------------
-  
+  # # Writing tables into Excel --------------------------------------------
+
   ### Tabulation Loop
 
-  ### REGIONAL ELECTION VOTING TABLES  
-  
+  ### REGIONAL ELECTION VOTING TABLES
+
   if (general[x,"Encuesta"] == "post" & !is.null(CIS$RECUERDO)) {
 
     # Different code required for weighted and not weighted surveys.
     if (!is.na(general[x,"Ponderacion"])) {
-      
+
       # Security checks before defining weights
       if (is.factor(CIS[,general[[x,"Ponderacion"]]])) {
-          
+
         CISweight <- svydesign(ids = ~1, weights = as.numeric(as.character(CIS[,general[[x,"Ponderacion"]]])), data = CIS)
-          
+
           if (anyNA(CIS[,general[[x,"Ponderacion"]]])) { #Check wether there are NAs in the weights vector.
-            
+
             CIS[is.na(CIS[,general[[x,"Ponderacion"]]]),general[[x,"Ponderacion"]]] <- 0 # Replace NAs with 0s
-            
+
             # Weights specification for survey design definition
             CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
           }
-        
+
         } else if (anyNA(CIS[,general[[x,"Ponderacion"]]])) { #Check wether there are NAs in the weights vector.
-        
+
           CIS[is.na(CIS[,general[[x,"Ponderacion"]]]),general[[x,"Ponderacion"]]] <- 0 # Replace NAs with 0s
-          
+
           # Weights specification for survey design definition
           CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
-        
+
           } else {
           CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
       }
-      
+
       # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
       if (!is.null(CIS$RVAUTAGR)) {
         autonotab(RECUERDO = CIS$RECUERDO, RVAUT = CIS$RVAUTAGR, weight = CISweight)
@@ -191,7 +195,7 @@ for (x in 1:nrow(general)) {
         generaltab(RECUERDO = CIS$RECUERDO, RVGEN = CIS$RVGENAGR, weight = CISweight)
       }
   } else {
-      
+
       # Finally, we create and export the table into an Excel file with autonotab() and generaltab(), which rely on write_tab_header.
       if (!is.null(CIS$RVAUTAGR)) {
         autonotab(RECUERDO = CIS$RECUERDO, RVAUTAGR = CIS$RVAUTAGR)
@@ -203,9 +207,9 @@ for (x in 1:nrow(general)) {
   }
 
   ### VOTING INTENTION TABLES (compared to vote recall from past election, usually 4 years ago)
-  
+
   if (!is.na(general[x,"Intencion.voto"]) & !is.na(general[x,"Voto.pasado"])) {
-    
+
     #Check wether there are NAs in the weights vector.
     if (!is.na(general[x,"Ponderacion"])) {
       if (anyNA(CIS[,general[[x,"Ponderacion"]]])) {
@@ -213,20 +217,20 @@ for (x in 1:nrow(general)) {
       }
     }
     if (!is.na(general[x,"Ponderacion"]) ) {
-      
+
       # Declare data to be survey data and weight it accordingly (if needed)
       CISweight <- svydesign(ids = ~1, weights = CIS[,general[[x,"Ponderacion"]]], data = CIS)
-      
+
       # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
       intentab(RVAUTAGR = CIS$RVAUTAGR, INTVAGR = CIS$INTVAGR, weight = CISweight)
-      
+
     } else {
-      
+
       # Creation of the table and exportation to Excel with intentab(), which relies on write_tab_header
       intentab(RVAUTAGR = CIS$RVAUTAGR, INTVAGR = CIS$INTVAGR)
     }
   }
- 
+
   # Export to SPSS ------------------------------------------------------
   
   # Removing the variable RECUERDO from the data frame CIS. It is used as a token during the loop.
