@@ -35,13 +35,12 @@ general <- filter(general, (!is.na(general$Token)))
 
 # Loop ----------------------------------------------------------------
 
-starttime <- now() #at the end now() - starttime
 for (x in 1:nrow(general)) { 
+  
+  # Importing data ------------------------------------------------------
   
   # Setting working directory for current survey file
   setwd(paste0(project_root, general[x, "Folder"]))
-  
-  # Importing data ------------------------------------------------------
   
   # Reading survey data from SPSS into R with `foreign`. Alternatively: haven::read_spss(file = general[[x, "Savfile"]], user_na = TRUE)
   CIS <- foreign_to_labelled(read.spss(file = general[[x, "Savfile"]],
@@ -135,7 +134,7 @@ for (x in 1:nrow(general)) {
   # ORIGEN (para encuestas en Catalunya) agregada manualmente CIS$ORIGENAGR
   
   
-  # # Writing tables into Excel --------------------------------------------
+  # Writing tables into Excel --------------------------------------------
 
   ### Tabulation Loop
 
@@ -215,7 +214,7 @@ for (x in 1:nrow(general)) {
   }
 
 
-# Data cleaning before exporting ------------------------------------------------------
+  # Data cleaning before exporting ------------------------------------------------------
 
   # Rename new variable to include data from year, time of survey and type of variable with votevarname()
   if (!is.na(general[[x,"Otro.reciente"]])) {
@@ -251,12 +250,12 @@ for (x in 1:nrow(general)) {
         CIS <- CIS[, -col_to_remove]
   }
 
-# Export to SPSS ------------------------------------------------------
+  # Export to SPSS ------------------------------------------------------
   
   # Better to use haven's function. Labelled data is read correctly by SPSS.
   write_sav(CIS, path = paste("nuevo", general[x,"Savfile"]))
   
-# Loop tracking -------------------
+  # Loop tracking -------------------
 
   if (x %% 50 == 0) { 
     print(paste0("Progress: ", x, " out of ", nrow(general), " iterations completed."))
