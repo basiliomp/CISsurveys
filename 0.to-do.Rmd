@@ -41,10 +41,10 @@ Las variables solicitadas son:
 
 ☑ Add code to generate a table using voting intention variable in pre-election surveys.
 
-☐ Check the tables created by the code and how they look in MS Excel.
-    ☐ If possible, consider the pros and cons of using the package "WriteXLS" in this process. 
+☑ Check the tables created by the code and how they look in MS Excel.
+    -If possible, consider the pros and cons of using the package "WriteXLS" in this process. 
 
-☐ Check weights in relative frequency tables.
+☑ Check weights in relative frequency tables.
 
 ☑ Clean and reorganise when needed the mess with AND / ESP surveys (2000, 2004 & 2008) in files and general table.
 
