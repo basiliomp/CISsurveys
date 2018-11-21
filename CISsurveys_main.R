@@ -65,16 +65,11 @@ for (x in 1:nrow(general)) {
     #Placeholder for the vote recall variable
     CIS$RECUERDO <- factor(x = 0, levels = unique(c(levels(CIS$Voto.reciente), 
                                                     levels(CIS$Otro.reciente),
-                                                    "AbstenciÃ³n", "N.C. participaciÃ³n")))
+                                                    "Abstención", "N.C. participación")))
     
     # Apply the tailored function in order to get a complete voting behaviour variable
     CIS <- voterecall(df = CIS)
-    
-    # Rename new variable to include data from year, time of survey and type of variable with votevarname()
-    # The "RECUERDO" variable is kept for later usage in tabulation.
-    CIS <- cbind(CIS, CIS$RECUERDO)
-    names(CIS)[which(names(CIS) == "CIS$RECUERDO")] <- as.character(votevarname(x))
-    
+
     } else if (!is.na(general[[x,"Voto.reciente"]]) & general[[x,"Voto.reciente"]] != "-") {
        CIS$RECUERDO <- CIS[[general[[x,"Voto.reciente"]]]]
        
@@ -92,6 +87,7 @@ for (x in 1:nrow(general)) {
     CIS$RVAUTAGR <- CIS[[general[[x,"Voto.pasado"]]]]
     
     # Rename new variable to include data from year, time of survey and type of variable with votevarname()
+    CIS <- cbind(CIS, CIS$RVAUTAGR)
     simplepastyear <- str_extract(string = as.character(general[[x, "Year"]] - 4), pattern = "..$")
     names(CIS)[which(names(CIS) == "RVAUTAGR")] <- paste0("RVAUT", simplepastyear, "AGR")
     
@@ -103,16 +99,6 @@ for (x in 1:nrow(general)) {
   if (!is.na(general[x,"Voto.generales"])) {
     CIS$RVGENAGR <- CIS[[general[[x,"Voto.generales"]]]]
     
-    # Rename new variable to include data from year, time of survey and type of variable with votevarname()
-    simplepastyear2 <- case_when(general[[x, "Year"]] <= 2000 ~ "96",
-                      general[[x, "Year"]] > 2000 & general[[x, "Year"]] <= 2004 ~ "00",
-                      general[[x, "Year"]] > 2004 & general[[x, "Year"]] <= 2008 ~ "04",
-                      general[[x, "Year"]] > 2008 & general[[x, "Year"]] <= 2011 ~ "08",
-                      general[[x, "Year"]] > 2011 & general[[x, "Year"]] <= 2015 ~ "11",
-                      general[[x, "Year"]] > 2015 & general[[x, "Year"]] <= 2016 ~ "15",
-                      general[[x, "Year"]] > 2016 & general[[x, "Year"]] <= 2018 ~ "16")
-    names(CIS)[which(names(CIS) == "RVGENAGR")] <- paste0("RVGEN", simplepastyear2, "AGR")
-    
   } else {
     general[x, "Looperror"] <- print(paste("Lack of GENERALES in", general$Token[[x]]))
   }
@@ -121,9 +107,6 @@ for (x in 1:nrow(general)) {
   if (!is.na(general[x,"Intencion.voto"])) {
     CIS$INTVAGR <- CIS[[general[[x,"Intencion.voto"]]]]
     
-    # Rename new variable to include data from year, time of survey and type of variable with votevarname()
-    simplepastyear <- str_extract(string = as.character(general[[x, "Year"]]), pattern = "..$")
-    names(CIS)[which(names(CIS) == "INTVAGR")] <- paste0("INTV", simplepastyear, "AGR")
   } else {
     general[x, "Looperror"] <- print(paste("Lack of Intencion.voto in", general$Token[[x]]))
   }
@@ -231,12 +214,44 @@ for (x in 1:nrow(general)) {
     }
   }
 
-  # Export to SPSS ------------------------------------------------------
-  
-  # Removing the variable RECUERDO from the data frame CIS. It is used as a token during the loop.
-  if ("RECUERDO" %in% names(CIS)) {
-    CIS$RECUERDO <- NULL
+
+# Data cleaning before exporting ------------------------------------------------------
+
+  # Rename new variable to include data from year, time of survey and type of variable with votevarname()
+  if (!is.na(general[[x,"Otro.reciente"]])) {
+    CIS <- cbind(CIS, CIS$RECUERDO)
+    col_to_remove <- which(names(CIS) == "RECUERDO")
+    names(CIS)[which(names(CIS) == "RECUERDO")] <- as.character(votevarname(x))
+    CIS <- CIS[, -col_to_remove]
   }
+  
+  if (!is.na(general[x,"Voto.generales"])) {
+      # Rename new variable to include data from year, time of survey and type of variable with votevarname()
+      simplepastyear2 <- case_when(general[[x, "Year"]] <= 2000 ~ "96",
+                                   general[[x, "Year"]] > 2000 & general[[x, "Year"]] <= 2004 ~ "00",
+                                   general[[x, "Year"]] > 2004 & general[[x, "Year"]] <= 2008 ~ "04",
+                                   general[[x, "Year"]] > 2008 & general[[x, "Year"]] <= 2011 ~ "08",
+                                   general[[x, "Year"]] > 2011 & general[[x, "Year"]] <= 2015 ~ "11",
+                                   general[[x, "Year"]] > 2015 & general[[x, "Year"]] <= 2016 ~ "15",
+                                   general[[x, "Year"]] > 2016 & general[[x, "Year"]] <= 2018 ~ "16")
+      names(CIS)[which(names(CIS) == "RVGENAGR")] <- paste0("RVGEN", simplepastyear2, "AGR")
+      
+      # Removing the variable with old name
+      col_to_remove <- which(names(CIS) == "RVGENAGR")
+      CIS <- CIS[, -col_to_remove]
+  }    
+  
+  if (!is.na(general[x,"Intencion.voto"])) {
+        # Rename new variable to include data from year, time of survey and type of variable with votevarname()
+        simplepastyear <- str_extract(string = as.character(general[[x, "Year"]]), pattern = "..$")
+        names(CIS)[which(names(CIS) == "INTVAGR")] <- paste0("INTV", simplepastyear, "AGR")
+        
+        #Removing the variable with old name
+        col_to_remove <- which(names(CIS) == "INTVAGR")
+        CIS <- CIS[, -col_to_remove]
+  }
+
+# Export to SPSS ------------------------------------------------------
   
   # Better to use haven's function. Labelled data is read correctly by SPSS.
   write_sav(CIS, path = paste("nuevo", general[x,"Savfile"]))
